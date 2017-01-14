@@ -20,13 +20,21 @@
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
-# Initialize Qt resources from file resources.py
-import resources
+
+# Import
+import json
+import os.path
+
 # Import the code for the dialog
 from lizard_downloader_dialog import LizardDownloaderDialog
-import os.path
+from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
+from PyQt4.QtCore import QVariant
+from PyQt4.QtGui import QAction, QIcon, QPushButton
+from qgis.core import QgsVectorLayer, QgsField, QgsMapLayerRegistry
+from qgis.core import QgsFeature, QgsPoint, QgsGeometry
+import requests
+# Initialize Qt resources from file resources.py
+import resources
 
 
 class LizardDownloader:
@@ -57,6 +65,9 @@ class LizardDownloader:
 
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
+
+        # Create the dialog (after translation) and keep reference
+        self.dlg = LizardDownloaderDialog()
 
         # Declare instance attributes
         self.actions = []
@@ -163,8 +174,13 @@ class LizardDownloader:
         self.add_action(
             icon_path,
             text=self.tr(u'Lizard Downloader'),
-            callback=self.run,
+            callback=self.run_downloader,
+            add_to_toolbar=True,
             parent=self.iface.mainWindow())
+
+        # Connect the downloadButton with the show_data() function
+        downloadButton = QPushButton("downloadButton")
+        self.dlg.downloadButton.clicked.connect(self.show_data)
 
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
@@ -184,19 +200,35 @@ class LizardDownloader:
         result = self.dlg.exec_()
         # See if OK was pressed
         if result:
+            # Do something useful here - delete the line containing pass and
+            # substitute with your code.
+            pass
 
-            # import requests
-            # import json
+    def run_downloader(self):
+        """ Show the download GUI """
+        # show the dialog
+        self.dlg.show()
 
-            # def getPumpstations():
-            #     """
-            #     Function to return a json object with data about pump stations.
-            #     """
+    def show_data(self):
+        """ Show the data as a new layer on the map """
+        # Get the JSON containing the data from the Lizard API
+        url = "https://demo.lizard.net/api/v2/pumpstations/1/"
+        json_ = requests.get(url).json()
 
-            #     url = "https://demo.lizard.net/api/v2/pumpstations/1/" #?format=json achter link plakken # hiermee gelijk json downloaden, niet nodig om nog hele html formatting te downloaden, sneller, maar werkt mogelijk nog niet overal(?)
+        # Create a new memory vector layer
+        self.layer = QgsVectorLayer("Point", "pumpstation1", "memory")
+        QgsMapLayerRegistry.instance().addMapLayer(self.layer)
 
-            #     json_ = requests.get(url).json()
-            #     print json_['geometry']['coordinates'][1]
+        # Create a feature
+        feature = QgsFeature()
+        lat = float(json_['geometry']['coordinates'][0])
+        lon = float(json_['geometry']['coordinates'][1])
+        feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
 
-            #     return json_
+        # Add the feature to the layer
+        self.layer.startEditing()
+        self.layer.addFeature(feature, True)
+        self.layer.commitChanges()
 
+        # Close the lizard_downloader_dialog
+        self.dlg.close()
