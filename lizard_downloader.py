@@ -22,15 +22,13 @@
 """
 
 # Import
-import json
 import os.path
 
 # Import the code for the dialog
 from lizard_downloader_dialog import LizardDownloaderDialog
 from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtCore import QVariant
-from PyQt4.QtGui import QAction, QIcon, QPushButton
-from qgis.core import QgsVectorLayer, QgsField, QgsMapLayerRegistry
+from PyQt4.QtGui import QAction, QIcon
+from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
 from qgis.core import QgsFeature, QgsPoint, QgsGeometry
 import requests
 # Initialize Qt resources from file resources.py
@@ -91,17 +89,16 @@ class LizardDownloader:
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('LizardDownloader', message)
 
-    def add_action(
-        self,
-        icon_path,
-        text,
-        callback,
-        enabled_flag=True,
-        add_to_menu=True,
-        add_to_toolbar=True,
-        status_tip=None,
-        whats_this=None,
-        parent=None):
+    def add_action(self,
+                   icon_path,
+                   text,
+                   callback,
+                   enabled_flag=True,
+                   add_to_menu=True,
+                   add_to_toolbar=True,
+                   status_tip=None,
+                   whats_this=None,
+                   parent=None):
         """Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
@@ -179,7 +176,6 @@ class LizardDownloader:
             parent=self.iface.mainWindow())
 
         # Connect the downloadButton with the show_data() function
-        downloadButton = QPushButton("downloadButton")
         self.dlg.downloadButton.clicked.connect(self.show_data)
 
     def unload(self):
@@ -189,12 +185,12 @@ class LizardDownloader:
                 self.tr(u'&Lizard Downloader'),
                 action)
             self.iface.removeToolBarIcon(action)
-        # remove the toolbar
+        # Remove the toolbar
         del self.toolbar
 
     def run(self):
         """Run method that performs all the real work"""
-        # show the dialog
+        # Show the dialog
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
@@ -206,7 +202,7 @@ class LizardDownloader:
 
     def run_downloader(self):
         """ Show the download GUI """
-        # show the dialog
+        # Show the dialog
         self.dlg.show()
 
     def show_data(self):
