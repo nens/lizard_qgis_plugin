@@ -219,7 +219,8 @@ class LizardDownloader:
         json_ = requests.get(url).json()
 
         # Create a new memory vector layer
-        self.layer = QgsVectorLayer("Point", "pumpstation1_4", "memory")
+        self.layer = QgsVectorLayer(
+            "Point?crs=EPSG:4326", "pumpstation1_4", "memory")
         QgsMapLayerRegistry.instance().addMapLayer(self.layer)
 
         # Add attributes to the feature(s)
@@ -285,8 +286,10 @@ class LizardDownloader:
                         self.layer.updateFeature(feature)
                 else:
                     feature[key] = json_[key]
-                    self.layer.dataProvider().changeAttributeValues({feature.id():
-                        {self.layer.dataProvider().fieldNameMap()[key]: json_[key]}})
+                    self.layer.dataProvider().changeAttributeValues({
+                        feature.id(): {
+                            self.layer.dataProvider().fieldNameMap()[
+                                key]: json_[key]}})
                     self.layer.updateFields()
                     self.layer.updateFeature(feature)
             i += 1
