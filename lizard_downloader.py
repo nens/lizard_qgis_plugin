@@ -214,68 +214,44 @@ class LizardDownloader:
 
     def show_data(self):
         """ Show the data as a new layer on the map """
+
+        # Setup
+        WGS84 = "EPSG:4326"
+        asset_types = ["pumpstations"]
+        geometry_type = "Point"
+
         # Get the JSON containing the data from the Lizard API
-        url = "https://ggmn.lizard.net/api/v2/pumpstations/1/"
-        json_ = requests.get(url).json()
+        url = "https://ggmn.lizard.net/api/v2/{}/".format(asset_types[0])
+        results = requests.get(url).json()["results"]
 
         # Create a new memory vector layer
         self.layer = QgsVectorLayer(
-            "Point?crs=EPSG:4326", "pumpstation1_4", "memory")
+            "{}?crs={}".format(geometry_type, WGS84), asset_types[0], "memory")
         QgsMapLayerRegistry.instance().addMapLayer(self.layer)
 
-        # Add attributes to the feature(s)
-        for key in json_:
-            if type(json_[key]) == dict:
-                for lock in json_[key]:
-                    attr_name = str(key) + "_" + str(lock)
-                    self.layer.dataProvider().addAttributes(
-                        [QgsField(attr_name, QVariant.String)])
-            else:
-                self.layer.dataProvider().addAttributes(
-                    [QgsField(key, QVariant.String)])
+        # Add attributes to the layer
+        fields = [QgsField(attr, QVariant.String) for attr in results[
+            0] if attr != "geometry"]
+        self.layer.dataProvider().addAttributes(fields)
         self.layer.updateFields()
 
         # Create the feature(s)
-        for i in range(1, 5):
-            # Get the JSON containing the data from the Lizard API
-            url = "https://ggmn.lizard.net/api/v2/pumpstations/" + str(i) + "/"
-            json_ = requests.get(url).json()
-            # Create the feature
-            feature = QgsFeature(self.layer.pendingFields())
-            lat = float(json_['geometry']['coordinates'][0])
-            lon = float(json_['geometry']['coordinates'][1])
-            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
-            # Add the features to the layer
-            self.layer.dataProvider().addFeatures([feature])
-
-        # Set the attribute values
         self.layer.startEditing()
-        i = 1
-        for feature in self.layer.getFeatures():
-            url = "https://ggmn.lizard.net/api/v2/pumpstations/" + str(i) + "/"
-            json_ = requests.get(url).json()
-            for key in json_:
-                if type(json_[key]) == dict:
-                    for lock in json_[key]:
-                        attr_name = str(key) + "_" + str(lock)
-                        feature[attr_name] = json_[key][lock]
-                        self.layer.dataProvider().changeAttributeValues({
-                            feature.id(): {
-                                self.layer.dataProvider().fieldNameMap()[
-                                    attr_name]: json_[key][lock]}})
-                        self.layer.updateFields()
-                        self.layer.updateFeature(feature)
-                else:
-                    feature[key] = json_[key]
-                    self.layer.dataProvider().changeAttributeValues({
-                        feature.id(): {
-                            self.layer.dataProvider().fieldNameMap()[
-                                key]: json_[key]}})
-                    self.layer.updateFields()
-                    self.layer.updateFeature(feature)
-            i += 1
+        features = []
+        for result in results:
+            feature = QgsFeature(self.layer.pendingFields())
+            geometry = result.pop("geometry")
+            lat = float(geometry['coordinates'][0])
+            lon = float(geometry['coordinates'][1])
+            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+            for attribute, value in result.iteritems():
+                feature.setAttribute(attribute, value)
+            features.append(feature)
+
+        # Add the features to the layer
+        self.layer.dataProvider().addFeatures(features)
+
         self.layer.commitChanges()
-        del i
 
         # Close the lizard_downloader_dialog
         self.dlg.close()
