@@ -24,15 +24,22 @@
 # Import
 import os.path
 
-# Import the code for the dialog
-from lizard_downloader_dialog import LizardDownloaderDialog
-from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt4.QtGui import QAction, QIcon
-from qgis.core import QgsVectorLayer, QgsMapLayerRegistry
-from qgis.core import QgsFeature, QgsPoint, QgsGeometry
+from PyQt4.QtCore import QCoreApplication
+from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import QTranslator
+from PyQt4.QtCore import QVariant
+from PyQt4.QtCore import qVersion
+from PyQt4.QtGui import QAction
+from PyQt4.QtGui import QIcon
+from qgis.core import QgsFeature
+from qgis.core import QgsField
+from qgis.core import QgsGeometry
+from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsPoint
+from qgis.core import QgsVectorLayer
 import requests
-# Initialize Qt resources from file resources.py
-import resources
+
+from lizard_downloader_dialog import LizardDownloaderDialog
 
 
 class LizardDownloader:
@@ -69,7 +76,7 @@ class LizardDownloader:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Lizard Downloader')
+        self.menu = self.tr(u'&Lizard Viewer')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'LizardDownloader')
         self.toolbar.setObjectName(u'LizardDownloader')
@@ -170,7 +177,7 @@ class LizardDownloader:
         icon_path = ':/plugins/LizardDownloader/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Lizard Downloader'),
+            text=self.tr(u'Lizard Viewer'),
             callback=self.run_downloader,
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
@@ -182,7 +189,7 @@ class LizardDownloader:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Lizard Downloader'),
+                self.tr(u'&Lizard Viewer'),
                 action)
             self.iface.removeToolBarIcon(action)
         # Remove the toolbar
@@ -207,23 +214,47 @@ class LizardDownloader:
 
     def show_data(self):
         """ Show the data as a new layer on the map """
+
+        # Setup
+        WGS84 = "EPSG:4326"
+        asset_types = ["pumpstations"]
+        geometry_type = "Point"
+        payload = {"page_size": 100}
+
         # Get the JSON containing the data from the Lizard API
-        url = "https://demo.lizard.net/api/v2/pumpstations/1/"
-        json_ = requests.get(url).json()
+        base_url = "https://demo.lizard.net/api/v2/"
+        url = "{}{}/".format(base_url, asset_types[0])
+        r = requests.get(url, params=payload).json()
+        results = r["results"]
+        # count = r["count"]
 
         # Create a new memory vector layer
-        self.layer = QgsVectorLayer("Point", "pumpstation1", "memory")
+        self.layer = QgsVectorLayer(
+            "{}?crs={}".format(geometry_type, WGS84), asset_types[0], "memory")
         QgsMapLayerRegistry.instance().addMapLayer(self.layer)
 
-        # Create a feature
-        feature = QgsFeature()
-        lat = float(json_['geometry']['coordinates'][0])
-        lon = float(json_['geometry']['coordinates'][1])
-        feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+        # Add attributes to the layer
+        fields = [QgsField(attr, QVariant.String) for attr in results[
+            0] if attr != "geometry"]
+        self.layer.dataProvider().addAttributes(fields)
+        self.layer.updateFields()
 
-        # Add the feature to the layer
+        # Create the feature(s)
         self.layer.startEditing()
-        self.layer.addFeature(feature, True)
+        features = []
+        for result in results:
+            feature = QgsFeature(self.layer.pendingFields())
+            geometry = result.pop("geometry")
+            lat = float(geometry['coordinates'][0])
+            lon = float(geometry['coordinates'][1])
+            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+            for attribute, value in result.iteritems():
+                feature.setAttribute(attribute, value)
+            features.append(feature)
+
+        # Add the features to the layer
+        self.layer.dataProvider().addFeatures(features)
+
         self.layer.commitChanges()
 
         # Close the lizard_downloader_dialog
