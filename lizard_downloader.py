@@ -219,10 +219,14 @@ class LizardDownloader:
         WGS84 = "EPSG:4326"
         asset_types = ["pumpstations"]
         geometry_type = "Point"
+        payload = {"page_size": 100}
 
         # Get the JSON containing the data from the Lizard API
-        url = "https://ggmn.lizard.net/api/v2/{}/".format(asset_types[0])
-        results = requests.get(url).json()["results"]
+        base_url = "https://demo.lizard.net/api/v2/"
+        url = "{}{}/".format(base_url, asset_types[0])
+        r = requests.get(url, params=payload).json()
+        results = r["results"]
+        # count = r["count"]
 
         # Create a new memory vector layer
         self.layer = QgsVectorLayer(
