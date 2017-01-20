@@ -24,22 +24,22 @@
 # Import
 import os.path
 
-from PyQt4.QtCore import QCoreApplication, QSettings, QTranslator, QVariant
-
+from PyQt4.QtCore import QCoreApplication
+from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import QTranslator
+from PyQt4.QtCore import QVariant
 from PyQt4.QtCore import qVersion
-
-from PyQt4.QtGui import QAction, QIcon
-
-# Import the code for the dialog
-from lizard_downloader_dialog import LizardDownloaderDialog
-
-from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPoint
-
-from qgis.core import QgsMapLayerRegistry, QgsVectorLayer
-
+from PyQt4.QtGui import QAction
+from PyQt4.QtGui import QIcon
+from qgis.core import QgsFeature
+from qgis.core import QgsField
+from qgis.core import QgsGeometry
+from qgis.core import QgsMapLayerRegistry
+from qgis.core import QgsPoint
+from qgis.core import QgsVectorLayer
 import requests
-# Initialize Qt resources from file resources.py
-import resources
+
+from lizard_downloader_dialog import LizardDownloaderDialog
 
 
 class LizardDownloader:
