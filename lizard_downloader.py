@@ -76,7 +76,7 @@ class LizardDownloader:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u'&Lizard Downloader')
+        self.menu = self.tr(u'&Lizard Viewer')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'LizardDownloader')
         self.toolbar.setObjectName(u'LizardDownloader')
@@ -177,7 +177,7 @@ class LizardDownloader:
         icon_path = ':/plugins/LizardDownloader/icon.png'
         self.add_action(
             icon_path,
-            text=self.tr(u'Lizard Downloader'),
+            text=self.tr(u'Lizard Viewer'),
             callback=self.run_downloader,
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
@@ -189,7 +189,7 @@ class LizardDownloader:
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
             self.iface.removePluginMenu(
-                self.tr(u'&Lizard Downloader'),
+                self.tr(u'&Lizard Viewer'),
                 action)
             self.iface.removeToolBarIcon(action)
         # Remove the toolbar
@@ -235,37 +235,18 @@ class LizardDownloader:
                     [QgsField(key, QVariant.String)])
         self.layer.updateFields()
 
-        # Create a feature
-        feature = QgsFeature(self.layer.pendingFields())
-        lat = float(json_['geometry']['coordinates'][0])
-        lon = float(json_['geometry']['coordinates'][1])
-        feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
-
-        # Create a 2nd feature for testing purposes - hard coded
-        url2 = "https://ggmn.lizard.net/api/v2/pumpstations/2/"
-        json_2 = requests.get(url2).json()
-        feature2 = QgsFeature(self.layer.pendingFields())
-        lat2 = float(json_2['geometry']['coordinates'][0])
-        lon2 = float(json_2['geometry']['coordinates'][1])
-        feature2.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat2, lon2)))
-        # Create a 3rd feature for testing purposes - hard coded
-        url3 = "https://ggmn.lizard.net/api/v2/pumpstations/3/"
-        json_3 = requests.get(url3).json()
-        feature3 = QgsFeature(self.layer.pendingFields())
-        lat3 = float(json_3['geometry']['coordinates'][0])
-        lon3 = float(json_3['geometry']['coordinates'][1])
-        feature3.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat3, lon3)))
-        # Create a 2nd feature for testing purposes - hard coded
-        url4 = "https://ggmn.lizard.net/api/v2/pumpstations/4/"
-        json_4 = requests.get(url4).json()
-        feature4 = QgsFeature(self.layer.pendingFields())
-        lat4 = float(json_4['geometry']['coordinates'][0])
-        lon4 = float(json_4['geometry']['coordinates'][1])
-        feature4.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat4, lon4)))
-
-        # Add the features to the layer
-        self.layer.dataProvider().addFeatures(
-            [feature, feature2, feature3, feature4])
+        # Create the feature(s)
+        for i in range(1, 5):
+            # Get the JSON containing the data from the Lizard API
+            url = "https://ggmn.lizard.net/api/v2/pumpstations/" + str(i) + "/"
+            json_ = requests.get(url).json()
+            # Create the feature
+            feature = QgsFeature(self.layer.pendingFields())
+            lat = float(json_['geometry']['coordinates'][0])
+            lon = float(json_['geometry']['coordinates'][1])
+            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+            # Add the features to the layer
+            self.layer.dataProvider().addFeatures([feature])
 
         # Set the attribute values
         self.layer.startEditing()
@@ -295,10 +276,6 @@ class LizardDownloader:
             i += 1
         self.layer.commitChanges()
         del i
-
-        # Add the feature to the layer
-        self.layer.startEditing()
-        self.layer.commitChanges()
 
         # Close the lizard_downloader_dialog
         self.dlg.close()
