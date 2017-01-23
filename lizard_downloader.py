@@ -36,6 +36,7 @@ from qgis.core import QgsField
 from qgis.core import QgsGeometry
 from qgis.core import QgsMapLayerRegistry
 from qgis.core import QgsPoint
+from qgis.core import QgsSvgMarkerSymbolLayerV2
 from qgis.core import QgsVectorLayer
 import requests
 
@@ -216,7 +217,7 @@ class LizardDownloader:
         """ Show the data as a new layer on the map """
 
         # Setup
-        WGS84 = "EPSG:4326"
+        wgs84 = "EPSG:4326"
         asset_types = ["pumpstations"]
         geometry_type = "Point"
         payload = {"page_size": 100}
@@ -230,7 +231,17 @@ class LizardDownloader:
 
         # Create a new memory vector layer
         self.layer = QgsVectorLayer(
-            "{}?crs={}".format(geometry_type, WGS84), asset_types[0], "memory")
+            "{}?crs={}".format(geometry_type, wgs84), asset_types[0], "memory")
+
+        # Add Lizard style (SVG)
+        svg_style = {}
+        svg_path = os.path.join(
+            self.plugin_dir, "styles/{}.svg".format(asset_types[0]))
+        svg_style["name"] = svg_path
+        symbol_layer = QgsSvgMarkerSymbolLayerV2.create(svg_style)
+        self.layer.rendererV2().symbols()[0].changeSymbolLayer(0, symbol_layer)
+
+        # Add the layer
         QgsMapLayerRegistry.instance().addMapLayer(self.layer)
 
         # Add attributes to the layer
@@ -254,7 +265,6 @@ class LizardDownloader:
 
         # Add the features to the layer
         self.layer.dataProvider().addFeatures(features)
-
         self.layer.commitChanges()
 
         # Close the lizard_downloader_dialog
