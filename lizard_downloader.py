@@ -22,7 +22,9 @@
 """
 
 # Import
+import json
 import os.path
+import urllib2
 
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
@@ -37,7 +39,6 @@ from qgis.core import QgsGeometry
 from qgis.core import QgsMapLayerRegistry
 from qgis.core import QgsPoint
 from qgis.core import QgsVectorLayer
-import requests
 
 from lizard_downloader_dialog import LizardDownloaderDialog
 
@@ -216,21 +217,24 @@ class LizardDownloader:
         """ Show the data as a new layer on the map """
 
         # Setup
-        WGS84 = "EPSG:4326"
+        wgs84 = "EPSG:4326"
         asset_types = ["pumpstations"]
         geometry_type = "Point"
         payload = {"page_size": 100}
 
         # Get the JSON containing the data from the Lizard API
         base_url = "https://demo.lizard.net/api/v2/"
-        url = "{}{}/".format(base_url, asset_types[0])
-        r = requests.get(url, params=payload).json()
+        url = "{}{}/?{}={}".format(
+            base_url, asset_types[0],
+            payload.items()[0][0], payload.items()[0][1])
+        response = urllib2.urlopen(url)
+        r = json.load(response)
         results = r["results"]
         # count = r["count"]
 
         # Create a new memory vector layer
         self.layer = QgsVectorLayer(
-            "{}?crs={}".format(geometry_type, WGS84), asset_types[0], "memory")
+            "{}?crs={}".format(geometry_type, wgs84), asset_types[0], "memory")
         QgsMapLayerRegistry.instance().addMapLayer(self.layer)
 
         # Add attributes to the layer
@@ -254,7 +258,6 @@ class LizardDownloader:
 
         # Add the features to the layer
         self.layer.dataProvider().addFeatures(features)
-
         self.layer.commitChanges()
 
         # Close the lizard_downloader_dialog
