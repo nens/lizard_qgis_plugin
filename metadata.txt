@@ -7,9 +7,9 @@
 # This file should be included when you package your plugin.# Mandatory items:
 
 [general]
-name=Lizard Downloader
+name=Lizard Viewer
 qgisMinimumVersion=2.0
-description=This plug-in helps with downloading data fromLizard in QGIS.
+description=This plug-in helps with downloading data from Lizard in QGIS.
 version=0.1
 author=Madeleine van Winkel
 email=madeleine.vanwinkel@nelen-schuurmans.nl
