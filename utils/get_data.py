@@ -1,30 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- LizardDownloader
-                                 A QGIS plugin
- This plug-in helps with downloading data fromLizard in QGIS.
-                              -------------------
-        begin                : 2017-01-25
-        git sha              : $Format:%H$
-        copyright            : (C) 2017 by Madeleine van Winkel
-        email                : madeleine.vanwinkel@nelen-schuurmans.nl
- ***************************************************************************/
+"""Module for getting the data from the Lizard API.
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+Created on: 2017-01-25
+By:         Madeleine van Winkel
+E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
 
-# Import
+Functions:
+    get_data(asset_type, payload)
+"""
 import requests
 
-from constants import BASE_URL
+from .constants import BASE_URL
 
 
 def get_data(asset_type, payload):

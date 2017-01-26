@@ -1,27 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- LizardDownloader
-                                 A QGIS plugin
- This plug-in helps with downloading data fromLizard in QGIS.
-                              -------------------
-        begin                : 2017-01-24
-        git sha              : $Format:%H$
-        copyright            : (C) 2017 by Madeleine van Winkel
-        email                : madeleine.vanwinkel@nelen-schuurmans.nl
- ***************************************************************************/
+"""Module for creating the layer.
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+Created on: 2017-01-25
+By:         Madeleine van Winkel
+E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
 
-# Import
+Functions:
+    create_layer(asset_type, list_of_assets)
+    add_attributes(layer, _list_of_assets)
+    add_features(layer, list_of_assets)
+
+"""
 from PyQt4.QtCore import QVariant
 from qgis.core import QgsFeature
 from qgis.core import QgsField
@@ -30,9 +19,9 @@ from qgis.core import QgsMapLayerRegistry
 from qgis.core import QgsPoint
 from qgis.core import QgsVectorLayer
 
-from constants import ASSET_GEOMETRY_TYPES
-from constants import WGS84
-from styler import apply_style
+from .constants import ASSET_GEOMETRY_TYPES
+from .constants import WGS84
+from .styler import apply_style
 
 
 def create_layer(asset_type, list_of_assets):

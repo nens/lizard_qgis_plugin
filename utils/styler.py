@@ -1,27 +1,14 @@
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- LizardDownloader
-                                 A QGIS plugin
- This plug-in helps with downloading data fromLizard in QGIS.
-                              -------------------
-        begin                : 2017-01-24
-        git sha              : $Format:%H$
-        copyright            : (C) 2017 by Madeleine van Winkel
-        email                : madeleine.vanwinkel@nelen-schuurmans.nl
- ***************************************************************************/
+"""Module for styling the layers..
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+Created on: 2017-01-24
+By:         Madeleine van Winkel
+E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
 
-# Import
+Functions:
+    apply_style(layer, asset_type)
+
+"""
 import os.path
 
 from qgis.core import QgsSvgMarkerSymbolLayerV2

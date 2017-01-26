@@ -1,27 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-/***************************************************************************
- LizardDownloader
-                                 A QGIS plugin
- This plug-in helps with downloading data fromLizard in QGIS.
-                              -------------------
-        begin                : 2017-01-25
-        git sha              : $Format:%H$
-        copyright            : (C) 2017 by Madeleine van Winkel
-        email                : madeleine.vanwinkel@nelen-schuurmans.nl
- ***************************************************************************/
+"""Module containing the constants.
 
-/***************************************************************************
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- ***************************************************************************/
-"""
+Created on: 2017-01-25
+By:         Madeleine van Winkel
+E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
 
-# Setup
+"""
 ASSET_TYPES = ["pumpstations"]
 ASSET_GEOMETRY_TYPES = {"pumpstations": "Point"}
 

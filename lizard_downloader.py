@@ -20,8 +20,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-
-# Import
 import os.path
 
 from PyQt4.QtCore import QCoreApplication
