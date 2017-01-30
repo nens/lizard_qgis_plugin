@@ -1,16 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for creating the layer.
-
-Created on: 2017-01-25
-By:         Madeleine van Winkel
-E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
-
-Functions:
-    create_layer(asset_type, list_of_assets)
-    add_attributes(layer, _list_of_assets)
-    add_features(layer, list_of_assets)
-
-"""
+"""Module for creating a layer."""
 from PyQt4.QtCore import QVariant
 from qgis.core import QgsFeature
 from qgis.core import QgsField

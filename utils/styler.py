@@ -1,14 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module for styling the layers..
-
-Created on: 2017-01-24
-By:         Madeleine van Winkel
-E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
-
-Functions:
-    apply_style(layer, asset_type)
-
-"""
+"""Module for styling the layer."""
 import os.path
 
 from qgis.core import QgsSvgMarkerSymbolLayerV2
