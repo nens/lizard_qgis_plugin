@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module containing the constants.
-
-Created on: 2017-01-25
-By:         Madeleine van Winkel
-E-mail:     madeleine.vanwinkel@nelen-schuurmans.nl
-
-"""
+"""Module containing the constants."""
 ASSET_TYPES = ["pumpstations"]
 ASSET_GEOMETRY_TYPES = {"pumpstations": "Point"}
 
