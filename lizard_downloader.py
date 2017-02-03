@@ -4,12 +4,13 @@ import os.path
 
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
-from lizard_downloader_dialog import LizardDownloaderDialog
+from dockwidget import Ui_DockWidget
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
@@ -44,15 +45,15 @@ class LizardDownloader:
             if qVersion() > '4.3.3':
                 QCoreApplication.installTranslator(self.translator)
 
-        # Create the dialog (after translation) and keep reference
-        self.dlg = LizardDownloaderDialog()
-
         # Declare instance attributes
         self.actions = []
         self.menu = self.tr(u'&Lizard Viewer')
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'LizardDownloader')
         self.toolbar.setObjectName(u'LizardDownloader')
+
+        self.pluginIsActive = False
+        self.dockwidget = None
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -117,9 +118,6 @@ class LizardDownloader:
             added to self.actions list.
         :rtype: QAction
         """
-        # Create the dialog (after translation) and keep reference
-        self.dlg = LizardDownloaderDialog()
-
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
         action.triggered.connect(callback)
@@ -149,12 +147,22 @@ class LizardDownloader:
         self.add_action(
             icon_path,
             text=self.tr(u'Lizard Viewer'),
-            callback=self.run_downloader,
+            callback=self.run,
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
 
-        # Connect the downloadButton with the show_data() function
-        self.dlg.downloadButton.clicked.connect(self.show_data)
+    def onClosePlugin(self):
+        """Cleanup necessary items here when plugin dockwidget is closed."""
+        # disconnects
+        self.dockwidget.closingPlugin.disconnect(self.onClosePlugin)
+
+        # remove this statement if dockwidget is to remain
+        # for reuse if plugin is reopened
+        # Commented next statement since it causes QGIS crashe
+        # when closing the docked window:
+        # self.dockwidget = None
+
+        self.pluginIsActive = False
 
     def unload(self):
         """Remove the plugin menu item and icon from QGIS GUI."""
@@ -167,21 +175,37 @@ class LizardDownloader:
         del self.toolbar
 
     def run(self):
-        """Run method that performs all the real work."""
-        # Show the dialog
-        self.dlg.show()
-        # Run the dialog event loop
-        result = self.dlg.exec_()
-        # See if OK was pressed
-        if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+        """Run method that loads and starts the plugin."""
+        if not self.pluginIsActive:
+            self.pluginIsActive = True
 
-    def run_downloader(self):
-        """Show the download GUI."""
-        # Show the dialog
-        self.dlg.show()
+            # dockwidget may not exist if:
+            #    first run of plugin
+            #    removed on close (see self.onClosePlugin method)
+            if self.dockwidget is None:
+                # Create the dockwidget (after translation) and keep reference
+                self.dockwidget = Ui_DockWidget()
+
+                def show_data(self):
+                    """Show the data as a new layer on the map."""
+                    # Get a list with JSONs containing the data from the Lizard
+                    # API
+                    payload = {"page_size": 100}
+                    list_of_assets = get_data(ASSET_TYPES[0], payload)
+
+                    # Create a new vector layer
+                    self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
+
+            # Connect the view_data_button with show_data()
+            self.dockwidget.view_data_button.clicked.connect(self.show_data)
+
+            # connect to provide cleanup on closing of dockwidget
+            self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+
+            # show the dockwidget
+            # TODO: fix to allow choice of dock location
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
+            self.dockwidget.show()
 
     def show_data(self):
         """Show the data as a new layer on the map."""
@@ -192,5 +216,5 @@ class LizardDownloader:
         # Create a new vector layer
         self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
 
-        # Close the lizard_downloader_dialog
-        self.dlg.close()
+        # # Close the lizard_downloader_dialog
+        # self.dlg.close()
