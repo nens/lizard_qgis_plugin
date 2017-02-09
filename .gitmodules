@@ -1,0 +1,3 @@
+[submodule "libs/lizard-connector"]
+	path = libs/lizard-connector
+	url = git@github.com:lizardsystem/lizard-connector.git
