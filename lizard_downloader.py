@@ -10,7 +10,7 @@ from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
-from dockwidget import Ui_DockWidget
+from .dockwidget import Ui_DockWidget
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
