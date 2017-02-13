@@ -9,6 +9,7 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
+from PyQt4.QtGui import QLineEdit
 
 from .dockwidget import Ui_DockWidget
 from .utils.constants import ASSET_TYPES
@@ -185,14 +186,14 @@ class LizardDownloader:
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = Ui_DockWidget()
-
+                # Password is shown in asterisks
+                self.dockwidget.user_password_input.setEchoMode(
+                    QLineEdit.Password)
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
-
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
-
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
