@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module containing the main file for the QGIS Lizard plug-in"""
 import os.path
+import urllib2
 
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
@@ -12,9 +13,11 @@ from PyQt4.QtGui import QIcon
 from PyQt4.QtGui import QLineEdit
 
 from .dockwidget import Ui_DockWidget
+import lizard_connector
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
+from .utils.set_dockwidget_gui import status_bar_text
 
 
 class LizardDownloader:
@@ -189,11 +192,21 @@ class LizardDownloader:
                 # Password is shown in asterisks
                 self.dockwidget.user_password_input.setEchoMode(
                     QLineEdit.Password)
+                # Connect the login_button with log_in()
+                self.dockwidget.login_button.clicked.connect(
+                    self.log_in)
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
+                # Connect the login_button with log_out()
+                self.dockwidget.logout_button.clicked.connect(
+                    self.log_out)
+                # Set the status bar text
+                status_bar_text(self, "Lizard Viewer started.")
+
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
+
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
@@ -207,3 +220,41 @@ class LizardDownloader:
 
         # Create a new vector layer
         self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
+
+    def log_in(self):
+        """Handle the log in."""
+        # Get the username
+        self.username = self.dockwidget.user_name_input.text()
+        # Get the password
+        self.password = self.dockwidget.user_password_input.text()
+
+        # Check if the user exists
+        try:
+            # Get the possible users of the API the user has access to
+            users = lizard_connector.connector.Endpoint(username=self.username,
+                                                        password=self.password,
+                                                        endpoint="users")
+            users_ = users.download()
+            # Check whether the username and password
+            # match with those of the API
+            for key in users_:
+                if key["username"] == self.username:
+                    # Show logged in in the status bar
+                    status_bar_text(self, "Logged in.")
+        except urllib2.HTTPError:
+            # Show log in error in the status bar
+            status_bar_text(self, "Can't find the user.")
+
+    def log_out(self):
+        """Handle the log out."""
+        # Reset the username and password if they exist
+        try:
+            del self.username
+        except:
+            status_bar_text("Username not found.")
+        try:
+            del self.password
+        except:
+            status_bar_text("Password not found.")
+        # Show logged out in the status bar
+        status_bar_text(self, "Logged out.")
