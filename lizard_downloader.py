@@ -186,17 +186,15 @@ class LizardDownloader:
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = Ui_DockWidget()
-
+                # Add the asset types to the data_types combobox
+                self.dockwidget.datatypes_combobox.addItems(ASSET_TYPES)
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
-
                 # Set the status bar text
                 status_bar_text(self, "Lizard Viewer started.")
-
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
-
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
@@ -204,15 +202,15 @@ class LizardDownloader:
 
     def show_data(self):
         """Show the data as a new layer on the map."""
-        # Set the status bar text
-        status_bar_text(self, "Downloading {}...".format(ASSET_TYPES[0]))
+        # Get the selected asset_type
+        asset_type_index = self.dockwidget.datatypes_combobox.currentIndex()
+        asset_type = ASSET_TYPES[asset_type_index]
+        status_bar_text(self, "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
-        list_of_assets = get_data(ASSET_TYPES[0], payload)
-
+        list_of_assets = get_data(asset_type, payload)
         # Create a new vector layer
-        self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
-
+        self.layer = create_layer(asset_type, list_of_assets)
         # Set the status bar text
-        asset_type_caps = ASSET_TYPES[0][0].capitalize() + ASSET_TYPES[0][1:]
+        asset_type_caps = asset_type[0].capitalize() + asset_type[1:]
         status_bar_text(self, "{} downloaded.".format(asset_type_caps))
