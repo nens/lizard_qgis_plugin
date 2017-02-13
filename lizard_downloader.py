@@ -14,6 +14,7 @@ from .dockwidget import Ui_DockWidget
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
+from .utils.set_dockwidget_gui import change_tab
 
 
 class LizardDownloader:
@@ -185,10 +186,17 @@ class LizardDownloader:
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = Ui_DockWidget()
-
+                # Connect the login_button with log_in()
+                self.dockwidget.login_button.clicked.connect(
+                    self.log_in)
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
+                # Connect the login_button with log_out()
+                self.dockwidget.logout_button.clicked.connect(
+                    self.log_out)
+                # Go to the select data tab
+                change_tab(self, "Select data")
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -206,3 +214,13 @@ class LizardDownloader:
 
         # Create a new vector layer
         self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
+
+    def log_in(self):
+        """Handle the log in."""
+        # Go to the select data tab
+        change_tab(self, "Select data")
+
+    def log_out(self):
+        """Handle the log out."""
+        # Go to the log in tab
+        change_tab(self, "Log in")
