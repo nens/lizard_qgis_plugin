@@ -17,6 +17,7 @@ import lizard_connector
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
+from .utils.set_dockwidget_gui import change_tab
 from .utils.set_dockwidget_gui import status_bar_text
 
 
@@ -241,6 +242,8 @@ class LizardDownloader:
                 if key["username"] == self.username:
                     # Show logged in in the status bar
                     status_bar_text(self, "Logged in.")
+                    # Go to the select data tab
+                    change_tab(self, "Select data")
         except urllib2.HTTPError:
             # Show log in error in the status bar
             status_bar_text(self, "Can't find the user.")
@@ -258,3 +261,5 @@ class LizardDownloader:
             status_bar_text("Password not found.")
         # Show logged out in the status bar
         status_bar_text(self, "Logged out.")
+        # Go to the log in tab
+        change_tab(self, "Log in")
