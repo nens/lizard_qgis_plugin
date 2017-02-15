@@ -7,9 +7,9 @@ def add_organisation_options(self):
     """Function to add organisation options to the organisations combobox."""
     # Get organisations of user
     endpoint = "organisations"
-    organisations = lizard_connector.connector.Endpoint(
+    orgs = lizard_connector.connector.Endpoint(
         username=self.username, password=self.password, endpoint=endpoint)
-    organisations = organisations.download()
+    organisations = orgs.download()
     organisations_names = [organisation[
         "name"] for organisation in organisations]
     # Add the organisations to the organisations combobox
