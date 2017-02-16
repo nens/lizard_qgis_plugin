@@ -186,18 +186,9 @@ class LizardDownloader:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = Ui_DockWidget()
 
-                def show_data(self):
-                    """Show the data as a new layer on the map."""
-                    # Get a list with JSONs containing the data from the Lizard
-                    # API
-                    payload = {"page_size": 100}
-                    list_of_assets = get_data(ASSET_TYPES[0], payload)
-
-                    # Create a new vector layer
-                    self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
-
-            # Connect the view_data_button with show_data()
-            self.dockwidget.view_data_button.clicked.connect(self.show_data)
+                # Connect the view_data_button with show_data()
+                self.dockwidget.view_data_button.clicked.connect(
+                    self.show_data)
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -215,6 +206,3 @@ class LizardDownloader:
 
         # Create a new vector layer
         self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
-
-        # # Close the lizard_downloader_dialog
-        # self.dlg.close()
