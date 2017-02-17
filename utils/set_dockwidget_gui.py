@@ -4,9 +4,9 @@
 
 def status_bar_text(self, string):
     """Set the text for the status bars."""
-    self.dockwidget.status_bar.setText(string)
-    self.dockwidget.status_bar.repaint()
-    self.dockwidget.status_bar_2.setText(string)
-    self.dockwidget.status_bar_2.repaint()
-    self.dockwidget.status_bar_3.setText(string)
-    self.dockwidget.status_bar_3.repaint()
+    self.dockwidget.status_bar_log_in.setText(string)
+    self.dockwidget.status_bar_log_in.repaint()
+    self.dockwidget.status_bar_select_data.setText(string)
+    self.dockwidget.status_bar_select_data.repaint()
+    self.dockwidget.status_bar_upload_data.setText(string)
+    self.dockwidget.status_bar_upload_data.repaint()
