@@ -10,11 +10,10 @@ from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
-from .dockwidget import Ui_DockWidget
+from .dockwidget import LizardViewer_DockWidget
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
-from .utils.set_dockwidget_gui import status_bar_text
 
 
 class LizardDownloader:
@@ -185,14 +184,15 @@ class LizardDownloader:
             #    removed on close (see self.onClosePlugin method)
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = Ui_DockWidget()
+                self.dockwidget = LizardViewer_DockWidget()
 
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
 
                 # Set the status bar text
-                status_bar_text(self, "Lizard Viewer started.")
+                LizardViewer_DockWidget.set_all_status_bars_text(
+                    self.dockwidget, "Lizard Viewer started.")
 
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
@@ -205,7 +205,8 @@ class LizardDownloader:
     def show_data(self):
         """Show the data as a new layer on the map."""
         # Set the status bar text
-        status_bar_text(self, "Downloading {}...".format(ASSET_TYPES[0]))
+        LizardViewer_DockWidget.set_all_status_bars_text(
+            self.dockwidget, "Downloading {}...".format(ASSET_TYPES[0]))
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
         list_of_assets = get_data(ASSET_TYPES[0], payload)
@@ -214,5 +215,6 @@ class LizardDownloader:
         self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
 
         # Set the status bar text
-        asset_type_caps = ASSET_TYPES[0][0].capitalize() + ASSET_TYPES[0][1:]
-        status_bar_text(self, "{} downloaded.".format(asset_type_caps))
+        LizardViewer_DockWidget.set_all_status_bars_text(
+            self.dockwidget, "{} downloaded.".format(
+                ASSET_TYPES[0].capitalize()))
