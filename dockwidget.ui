@@ -98,7 +98,7 @@
        <string>Log in</string>
       </property>
      </widget>
-     <widget class="QLabel" name="status_bar">
+     <widget class="QLabel" name="status_bar_log_in">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -220,7 +220,7 @@
        <string>Log out</string>
       </property>
      </widget>
-     <widget class="QLabel" name="status_bar_2">
+     <widget class="QLabel" name="status_bar_select_data">
       <property name="geometry">
        <rect>
         <x>7</x>
@@ -254,7 +254,7 @@
        <string>Uploaden</string>
       </property>
      </widget>
-     <widget class="QLabel" name="status_bar_3">
+     <widget class="QLabel" name="status_bar_upload_data">
       <property name="geometry">
        <rect>
         <x>7</x>

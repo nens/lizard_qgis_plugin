@@ -10,14 +10,14 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dockwidget.ui'))
 
 
-class Ui_DockWidget(QtGui.QDockWidget, FORM_CLASS):
+class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
     """Module for creating the dockwidget."""
 
     closingPlugin = pyqtSignal()
 
     def __init__(self, parent=None):
         """Constructor."""
-        super(Ui_DockWidget, self).__init__(parent)
+        super(LizardViewerDockWidget, self).__init__(parent)
         # Set up the user interface from Designer.
         # After setupUI you can access any designer object by doing
         # self.<objectname>, and you can use autoconnect slots - see
@@ -29,3 +29,16 @@ class Ui_DockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Module for closing the dockwidget."""
         self.closingPlugin.emit()
         event.accept()
+
+    def set_all_status_bars_text(self, string):
+        """Set the text for the status bars."""
+        status_bars = self.all_status_bars()
+        for status_bar in status_bars:
+            status_bar.setText(string)
+            status_bar.repaint()
+
+    def all_status_bars(self):
+        """Function to return all the status bars."""
+        return [self.status_bar_log_in,
+                self.status_bar_select_data,
+                self.status_bar_upload_data]
