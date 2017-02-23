@@ -17,8 +17,10 @@ import lizard_connector
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
+from .utils.set_dockwidget_gui import add_organisation_options
 from .utils.set_dockwidget_gui import change_tab
 from .utils.set_dockwidget_gui import clear_user_info
+from .utils.set_dockwidget_gui import remove_organisation_options
 from .utils.set_dockwidget_gui import status_bar_text
 
 
@@ -243,6 +245,8 @@ class LizardDownloader:
                 if key["username"] == self.username:
                     # Show logged in in the status bar
                     status_bar_text(self, "Logged in.")
+                    # Add organisation options
+                    add_organisation_options(self)
                     # Go to the select data tab
                     change_tab(self, "Select data")
                     # Clear the user info
@@ -264,7 +268,9 @@ class LizardDownloader:
             status_bar_text("Password not found.")
         # Show logged out in the status bar
         status_bar_text(self, "Logged out.")
-        # Go to the log in tab
-        change_tab(self, "Log in")
         # Clear the user info
         clear_user_info(self)
+        # Go to the log in tab
+        change_tab(self, "Log in")
+        # Remove the organisations from the combobox
+        remove_organisation_options(self)
