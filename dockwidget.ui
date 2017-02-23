@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_log_in">
      <attribute name="title">
@@ -98,7 +98,7 @@
        <string>Log in</string>
       </property>
      </widget>
-     <widget class="QLabel" name="status_bar">
+     <widget class="QLabel" name="status_bar_log_in">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -220,7 +220,7 @@
        <string>Log out</string>
       </property>
      </widget>
-     <widget class="QLabel" name="status_bar_2">
+     <widget class="QLabel" name="status_bar_select_data">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -274,10 +274,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>Uploaden</string>
+       <string>Upload data</string>
       </property>
      </widget>
-     <widget class="QLabel" name="status_bar_3">
+     <widget class="QLabel" name="status_bar_upload_data">
       <property name="geometry">
        <rect>
         <x>10</x>
