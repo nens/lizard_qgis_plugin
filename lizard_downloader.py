@@ -11,6 +11,8 @@ from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
 from .dockwidget import LizardViewerDockWidget
+from .dockwidget import TAB_LOG_IN
+from .dockwidget import TAB_SELECT_DATA
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
@@ -200,7 +202,7 @@ class LizardDownloader:
                 self.dockwidget.set_all_status_bars_text(
                     "Lizard Viewer started.")
                 # Go to the select data tab
-                self.dockwidget.change_tab("Select data")
+                self.dockwidget.change_tab(TAB_SELECT_DATA)
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
             # show the dockwidget
@@ -228,9 +230,9 @@ class LizardDownloader:
     def log_in(self):
         """Handle the log in."""
         # Go to the select data tab
-        self.dockwidget.change_tab("Select data")
+        self.dockwidget.change_tab(TAB_SELECT_DATA)
 
     def log_out(self):
         """Handle the log out."""
         # Go to the log in tab
-        self.dockwidget.change_tab("Log in")
+        self.dockwidget.change_tab(TAB_LOG_IN)

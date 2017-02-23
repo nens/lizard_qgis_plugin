@@ -9,6 +9,10 @@ from PyQt4.QtCore import pyqtSignal
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dockwidget.ui'))
 
+TAB_LOG_IN = "Log in"
+TAB_SELECT_DATA = "Select data"
+TAB_UPLOAD_DATA = "Upload data"
+
 
 class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
     """Module for creating the dockwidget."""
@@ -30,13 +34,20 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.closingPlugin.emit()
         event.accept()
 
-    def change_tab(self, string):
-        """Function to dynamically change tabs."""
-        if string == "Log in":
+    def change_tab(self, tab_constant):
+        """Function to dynamically change tabs.
+
+        Args:
+            tab_constans (str): Name of the tab. There are three possible
+                options: TAB_LOGIN for "Log in", TAB_SELECT_DATA for
+                "Select data" and TAB_UPLOAD_DATA for "Upload data".
+
+        """
+        if tab_constant == TAB_LOG_IN:
             self.tabWidget.setCurrentIndex(0)
-        elif string == "Select data":
+        elif tab_constant == TAB_SELECT_DATA:
             self.tabWidget.setCurrentIndex(1)
-        elif string == "Uploaden":
+        elif tab_constant == TAB_UPLOAD_DATA:
             self.tabWidget.setCurrentIndex(2)
 
     def set_all_status_bars_text(self, string):

@@ -251,7 +251,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Uploaden</string>
+       <string>Upload data</string>
       </property>
      </widget>
      <widget class="QLabel" name="status_bar_upload_data">
