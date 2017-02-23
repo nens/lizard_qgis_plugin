@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_log_in">
      <attribute name="title">
@@ -251,7 +251,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Uploaden</string>
+       <string>Upload data</string>
       </property>
      </widget>
      <widget class="QLabel" name="status_bar_upload_data">

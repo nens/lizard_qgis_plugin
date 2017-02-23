@@ -11,6 +11,8 @@ from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
 from .dockwidget import LizardViewerDockWidget
+from .dockwidget import TAB_LOG_IN
+from .dockwidget import TAB_SELECT_DATA
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
@@ -185,14 +187,22 @@ class LizardDownloader:
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = LizardViewerDockWidget()
-                # Add the asset types to the data_types combobox
-                self.dockwidget.datatypes_combobox.addItems(ASSET_TYPES)
+                # Connect the login_button with log_in()
+                self.dockwidget.login_button.clicked.connect(
+                    self.log_in)
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
+                # Connect the login_button with log_out()
+                self.dockwidget.logout_button.clicked.connect(
+                    self.log_out)
+                # Add the asset types to the data_types combobox
+                self.dockwidget.datatypes_combobox.addItems(ASSET_TYPES)
                 # Set the status bar text
                 self.dockwidget.set_all_status_bars_text(
                     "Lizard Viewer started.")
+                # Go to the select data tab
+                self.dockwidget.change_tab(TAB_SELECT_DATA)
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
             # show the dockwidget
@@ -216,3 +226,13 @@ class LizardDownloader:
         # Set the status bar text
         self.dockwidget.set_all_status_bars_text(
             "{} downloaded.".format(asset_type.capitalize()))
+
+    def log_in(self):
+        """Handle the log in."""
+        # Go to the select data tab
+        self.dockwidget.change_tab(TAB_SELECT_DATA)
+
+    def log_out(self):
+        """Handle the log out."""
+        # Go to the log in tab
+        self.dockwidget.change_tab(TAB_LOG_IN)
