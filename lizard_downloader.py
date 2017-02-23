@@ -10,11 +10,10 @@ from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
-from .dockwidget import Ui_DockWidget
+from .dockwidget import LizardViewerDockWidget
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
-from .utils.set_dockwidget_gui import change_tab
 
 
 class LizardDownloader:
@@ -185,7 +184,7 @@ class LizardDownloader:
             #    removed on close (see self.onClosePlugin method)
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
-                self.dockwidget = Ui_DockWidget()
+                self.dockwidget = LizardViewerDockWidget()
                 # Connect the login_button with log_in()
                 self.dockwidget.login_button.clicked.connect(
                     self.log_in)
@@ -195,12 +194,15 @@ class LizardDownloader:
                 # Connect the login_button with log_out()
                 self.dockwidget.logout_button.clicked.connect(
                     self.log_out)
+                # Add the asset types to the data_types combobox
+                self.dockwidget.datatypes_combobox.addItems(ASSET_TYPES)
+                # Set the status bar text
+                self.dockwidget.set_all_status_bars_text(
+                    "Lizard Viewer started.")
                 # Go to the select data tab
-                change_tab(self, "Select data")
-
+                self.dockwidget.change_tab("Select data")
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
-
             # show the dockwidget
             # TODO: fix to allow choice of dock location
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
@@ -208,19 +210,27 @@ class LizardDownloader:
 
     def show_data(self):
         """Show the data as a new layer on the map."""
+        # Get the selected asset_type
+        asset_type_index = self.dockwidget.datatypes_combobox.currentIndex()
+        asset_type = ASSET_TYPES[asset_type_index]
+        # Set the status bar text
+        self.dockwidget.set_all_status_bars_text(
+            "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
-        list_of_assets = get_data(ASSET_TYPES[0], payload)
-
+        list_of_assets = get_data(asset_type, payload)
         # Create a new vector layer
-        self.layer = create_layer(ASSET_TYPES[0], list_of_assets)
+        self.layer = create_layer(asset_type, list_of_assets)
+        # Set the status bar text
+        self.dockwidget.set_all_status_bars_text(
+            "{} downloaded.".format(asset_type.capitalize()))
 
     def log_in(self):
         """Handle the log in."""
         # Go to the select data tab
-        change_tab(self, "Select data")
+        self.dockwidget.change_tab("Select data")
 
     def log_out(self):
         """Handle the log out."""
         # Go to the log in tab
-        change_tab(self, "Log in")
+        self.dockwidget.change_tab("Log in")
