@@ -16,8 +16,8 @@ email=madeleine.vanwinkel@nelen-schuurmans.nl
 
 about=The purpose of this plug-in is to be able to download data from Lizard into QGIS. Requirements: QGIS version 2.0
 
-tracker=bug_tracker_github
-repository=repo_github
+tracker=https://github.com/nens/LizardViewer
+repository=https://github.com/nens/LizardViewer
 # End of mandatory metadata
 
 # Recommended items:
@@ -28,7 +28,7 @@ repository=repo_github
 # Tags are comma separated with spaces allowed
 tags=lizard, qgis, q-gis, plugin, plug-in, download, downloader, upload, uploader
 
-homepage=github_repository
+homepage=https://github.com/nens/LizardViewer
 category=Plugins
 icon=icon.png
 # experimental flag
