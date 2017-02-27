@@ -238,14 +238,14 @@ class LizardDownloader:
         # Get the username
         self.username = self.dockwidget.user_name_input.text()
         # Get the password
-        self.password = self.dockwidget.user_password_input.text()
 
         # Check if the user exists
         try:
             # Get the possible users of the API the user has access to
-            users = lizard_connector.connector.Endpoint(username=self.username,
-                                                        password=self.password,
-                                                        endpoint="users")
+            users = lizard_connector.connector.Endpoint(
+                username=self.username,
+                password=self.dockwidget.user_password_input.text(),
+                endpoint="users")
             users_ = users.download()
             # Check whether the username and password
             # match with those of the API
@@ -255,7 +255,8 @@ class LizardDownloader:
                     self.dockwidget.set_all_status_bars_text("Logged in.")
                     # Add organisation options
                     self.dockwidget.add_organisation_options(
-                        self.username, self.password)
+                        self.username,
+                        self.dockwidget.user_password_input.text())
                     # Go to the select data tab
                     self.dockwidget.change_tab(TAB_SELECT_DATA)
                     # Clear the user info
