@@ -73,6 +73,10 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         self.user_name_input.clear()
         self.user_password_input.clear()
 
+    def reset_datatypes_combobox(self):
+        """Function to reset the data."""
+        self.datatypes_combobox.setCurrentIndex(0)
+
     def set_all_status_bars_text(self, string):
         """Set the text for the status bars."""
         status_bars = self.all_status_bars()

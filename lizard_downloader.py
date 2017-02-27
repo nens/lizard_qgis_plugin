@@ -155,6 +155,7 @@ class LizardDownloader:
             callback=self.run,
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
+        self.username = None
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed."""
@@ -235,10 +236,13 @@ class LizardDownloader:
 
     def log_in(self):
         """Handle the log in."""
+        self.username = None
+        # Reset the Data type combobox
+        self.dockwidget.reset_datatypes_combobox()
+        # Remove the organisations from the combobox
+        self.dockwidget.remove_organisation_options()
         # Get the username
         self.username = self.dockwidget.user_name_input.text()
-        # Get the password
-
         # Check if the user exists
         try:
             # Get the possible users of the API the user has access to
@@ -247,8 +251,8 @@ class LizardDownloader:
                 password=self.dockwidget.user_password_input.text(),
                 endpoint="users")
             users_ = users.download()
-            # Check whether the username and password
-            # match with those of the API
+            # Check whether the username and password match with those of
+            # the API
             for key in users_:
                 if key["username"] == self.username:
                     # Show logged in in the status bar
@@ -263,21 +267,24 @@ class LizardDownloader:
                     self.dockwidget.clear_user_info()
         except urllib2.HTTPError:
             # Show log in error in the status bar
-            self.dockwidget.set_all_status_bars_text("Can't find the user.")
+            self.username = None
+            self.dockwidget.set_all_status_bars_text(
+                "User/password combination incorrect.")
 
     def log_out(self):
         """Handle the log out."""
         # Delete the username and password if they exist
-        try:
-            del self.username
-            del self.password
+        if self.username is not None:
+            self.username = None
             # Show logged out in the status bar
             self.dockwidget.set_all_status_bars_text("Logged out.")
-        except:
+            # Go to the log in tab
+            self.dockwidget.change_tab(TAB_LOG_IN)
+        else:
             self.dockwidget.set_all_status_bars_text("User not found.")
         # Clear the user info
         self.dockwidget.clear_user_info()
-        # Go to the log in tab
-        self.dockwidget.change_tab(TAB_LOG_IN)
+        # Reset the Data type combobox
+        self.dockwidget.reset_datatypes_combobox()
         # Remove the organisations from the combobox
         self.dockwidget.remove_organisation_options()
