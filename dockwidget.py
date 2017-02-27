@@ -45,8 +45,9 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         organisations = orgs.download()
         organisations_names = [organisation[
             "name"] for organisation in organisations]
+        organisations_sorted = sorted(organisations_names)
         # Add the organisations to the organisations combobox
-        self.organisations_combobox.addItems(organisations_names)
+        self.organisations_combobox.addItems(organisations_sorted)
 
     def remove_organisation_options(self):
         """Function to remove the organisation options from the combobox."""
