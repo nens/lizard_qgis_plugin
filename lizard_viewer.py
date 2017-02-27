@@ -13,6 +13,8 @@ from PyQt4.QtGui import QIcon
 from PyQt4.QtGui import QLineEdit
 
 import lizard_connector
+# Initialize Qt resources from file resources.py
+import resources
 from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_LOG_IN
 from .dockwidget import TAB_SELECT_DATA
@@ -21,7 +23,7 @@ from .utils.get_data import get_data
 from .utils.layer import create_layer
 
 
-class LizardDownloader:
+class LizardViewer:
     """QGIS Plugin Implementation."""
 
     def __init__(self, iface):
@@ -41,7 +43,7 @@ class LizardDownloader:
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'LizardDownloader_{}.qm'.format(locale))
+            'LizardViewer_{}.qm'.format(locale))
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -54,8 +56,8 @@ class LizardDownloader:
         self.actions = []
         self.menu = self.tr(u'&Lizard Viewer')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'LizardDownloader')
-        self.toolbar.setObjectName(u'LizardDownloader')
+        self.toolbar = self.iface.addToolBar(u'LizardViewer')
+        self.toolbar.setObjectName(u'LizardViewer')
 
         self.pluginIsActive = False
         self.dockwidget = None
@@ -73,7 +75,7 @@ class LizardDownloader:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('LizardDownloader', message)
+        return QCoreApplication.translate('LizardViewer', message)
 
     def add_action(self,
                    icon_path,
@@ -148,7 +150,7 @@ class LizardDownloader:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        icon_path = ':/plugins/LizardDownloader/icon.png'
+        icon_path = ':/plugins/LizardViewer/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Lizard Viewer'),
