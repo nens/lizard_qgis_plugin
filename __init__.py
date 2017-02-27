@@ -6,7 +6,7 @@ import sys
 
 # noinspection PyPep8Naming
 def classFactory(iface):  # pylint: disable=invalid-name
-    """Load LizardDownloader class from file LizardDownloader.
+    """Load LizardViewer class from file LizardViewer.
 
     :param iface: A QGIS interface instance.
     :type iface: QgsInterface
