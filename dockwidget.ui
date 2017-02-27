@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>323</width>
-    <height>417</height>
+    <width>317</width>
+    <height>448</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>321</width>
-      <height>391</height>
+      <width>311</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -33,10 +33,10 @@
      <widget class="QLabel" name="user_name_label">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>81</width>
-        <height>21</height>
+        <x>10</x>
+        <y>20</y>
+        <width>101</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
@@ -46,10 +46,10 @@
      <widget class="QLineEdit" name="user_name_input">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>30</y>
-        <width>113</width>
-        <height>27</height>
+        <x>120</x>
+        <y>20</y>
+        <width>171</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="placeholderText">
@@ -59,10 +59,10 @@
      <widget class="QLabel" name="user_password_label">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>80</y>
-        <width>68</width>
-        <height>21</height>
+        <x>10</x>
+        <y>70</y>
+        <width>101</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
@@ -72,10 +72,10 @@
      <widget class="QLineEdit" name="user_password_input">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>80</y>
-        <width>113</width>
-        <height>27</height>
+        <x>120</x>
+        <y>70</y>
+        <width>171</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="inputMethodHints">
@@ -88,7 +88,7 @@
      <widget class="QPushButton" name="login_button">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>140</y>
         <width>99</width>
         <height>27</height>
@@ -101,9 +101,9 @@
      <widget class="QLabel" name="status_bar_log_in">
       <property name="geometry">
        <rect>
-        <x>7</x>
-        <y>320</y>
-        <width>301</width>
+        <x>10</x>
+        <y>360</y>
+        <width>271</width>
         <height>20</height>
        </rect>
       </property>
@@ -122,8 +122,8 @@
      <widget class="QPushButton" name="view_data_button">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>210</y>
+        <x>120</x>
+        <y>250</y>
         <width>99</width>
         <height>27</height>
        </rect>
@@ -135,9 +135,9 @@
      <widget class="QComboBox" name="datatypes_combobox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>20</y>
-        <width>161</width>
+        <width>171</width>
         <height>27</height>
        </rect>
       </property>
@@ -145,7 +145,7 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QCheckBox" name="public_data_checkbox">
+     <widget class="QCheckBox" name="private_data_checkbox">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -155,10 +155,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>Public data</string>
+       <string>Private data</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="private_data_checkbox">
+     <widget class="QCheckBox" name="public_data_checkbox">
       <property name="geometry">
        <rect>
         <x>120</x>
@@ -168,7 +168,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Private data</string>
+       <string>Public data</string>
       </property>
      </widget>
      <widget class="QLabel" name="data_type_label">
@@ -176,7 +176,7 @@
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>68</width>
+        <width>101</width>
         <height>21</height>
        </rect>
       </property>
@@ -184,25 +184,25 @@
        <string>Data type</string>
       </property>
      </widget>
-     <widget class="QLabel" name="area_label">
+     <widget class="QLabel" name="organisations_label">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>10</x>
         <y>150</y>
-        <width>68</width>
+        <width>101</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Area</string>
+       <string>Organisations</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="area_combobox">
+     <widget class="QComboBox" name="organisations_combobox">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>120</x>
         <y>150</y>
-        <width>161</width>
+        <width>171</width>
         <height>27</height>
        </rect>
       </property>
@@ -210,8 +210,8 @@
      <widget class="QPushButton" name="logout_button">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>270</y>
+        <x>120</x>
+        <y>310</y>
         <width>99</width>
         <height>27</height>
        </rect>
@@ -223,9 +223,9 @@
      <widget class="QLabel" name="status_bar_select_data">
       <property name="geometry">
        <rect>
-        <x>7</x>
-        <y>320</y>
-        <width>301</width>
+        <x>10</x>
+        <y>360</y>
+        <width>271</width>
         <height>20</height>
        </rect>
       </property>
@@ -236,6 +236,29 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
+     <widget class="QComboBox" name="area_comboBox">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>200</y>
+        <width>171</width>
+        <height>27</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="area_label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>200</y>
+        <width>101</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Area</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_upload_data">
      <attribute name="title">
@@ -244,7 +267,7 @@
      <widget class="QPushButton" name="upload_button">
       <property name="geometry">
        <rect>
-        <x>110</x>
+        <x>100</x>
         <y>30</y>
         <width>99</width>
         <height>27</height>
@@ -257,9 +280,9 @@
      <widget class="QLabel" name="status_bar_upload_data">
       <property name="geometry">
        <rect>
-        <x>7</x>
-        <y>320</y>
-        <width>301</width>
+        <x>10</x>
+        <y>360</y>
+        <width>271</width>
         <height>20</height>
        </rect>
       </property>
