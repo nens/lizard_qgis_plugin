@@ -16,6 +16,8 @@ import unittest
 
 from PyQt4.QtGui import QIcon
 
+from utilities import get_qgis_app
+QGIS_APP = get_qgis_app()
 
 
 class LizardViewerResourcesTest(unittest.TestCase):
