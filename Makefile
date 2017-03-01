@@ -1,23 +1,3 @@
-#/***************************************************************************
-# LizardDownloader
-#
-# This plug-in helps with downloading data fromLizard in QGIS.
-#							 -------------------
-#		begin				: 2017-01-11
-#		git sha				: $Format:%H$
-#		copyright			: (C) 2017 by Madeleine van Winkel
-#		email				: madeleine.vanwinkel@nelen-schuurmans.nl
-# ***************************************************************************/
-#
-#/***************************************************************************
-# *																		 *
-# *   This program is free software; you can redistribute it and/or modify  *
-# *   it under the terms of the GNU General Public License as published by  *
-# *   the Free Software Foundation; either version 2 of the License, or	 *
-# *   (at your option) any later version.								   *
-# *																		 *
-# ***************************************************************************/
-
 #################################################
 # Edit the following to match your sources lists
 #################################################
@@ -38,15 +18,15 @@ LOCALES =
 # translation
 SOURCES = \
 	__init__.py \
-	lizard_downloader.py lizard_downloader_dialog.py
+	lizard_viewer.py dockwidget.py
 
-PLUGINNAME = LizardDownloader
+PLUGINNAME = LizardViewer
 
 PY_FILES = \
 	__init__.py \
-	lizard_downloader.py lizard_downloader_dialog.py
+	lizard_viewer.py dockwidget.py
 
-UI_FILES = lizard_downloader_dialog_base.ui
+UI_FILES = dockwidget.ui
 
 EXTRAS = metadata.txt icon.png
 

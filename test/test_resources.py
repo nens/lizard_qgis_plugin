@@ -16,10 +16,12 @@ import unittest
 
 from PyQt4.QtGui import QIcon
 
+from utilities import get_qgis_app
+QGIS_APP = get_qgis_app()
 
 
-class LizardDownloaderDialogTest(unittest.TestCase):
-    """Test rerources work."""
+class LizardViewerResourcesTest(unittest.TestCase):
+    """Test resources work."""
 
     def setUp(self):
         """Runs before each test."""
@@ -31,14 +33,12 @@ class LizardDownloaderDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/LizardDownloader/icon.png'
+        path = ':/plugins/LizardViewer/icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 
+
 if __name__ == "__main__":
-    suite = unittest.makeSuite(LizardDownloaderResourcesTest)
+    suite = unittest.makeSuite(LizardViewerResourcesTest)
     runner = unittest.TextTestRunner(verbosity=2)
     runner.run(suite)
-
-
-

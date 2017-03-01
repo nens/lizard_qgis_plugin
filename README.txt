@@ -1,7 +1,7 @@
 Plugin Builder Results
 
 Your plugin LizardDownloader was created in:
-    /home/madeleine.vanwinkel/Desktop/The_PlugIN/LizardDownloader
+    /home/madeleine.vanwinkel/Desktop/The_PlugIN/LizardViewer
 
 Your QGIS plugin directory is located at:
     /home/madeleine.vanwinkel/.qgis2/python/plugins
@@ -17,11 +17,11 @@ What's Next:
 
   * Test the plugin by enabling it in the QGIS plugin manager
 
-  * Customize it by editing the implementation file: ``lizard_downloader.py``
+  * Customize it by editing the implementation file: ``lizard_viewer.py``
 
   * Create your own custom icon, replacing the default icon.png
 
-  * Modify your user interface by opening LizardDownloader.ui in Qt Designer
+  * Modify your user interface by opening dockwidget.ui in Qt Designer
 
   * You can use the Makefile to compile your Ui and resource files when
     you make changes. This requires GNU make (gmake)
