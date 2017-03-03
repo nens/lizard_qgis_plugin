@@ -10,7 +10,9 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
+from PyQt4.QtGui import QKeySequence
 from PyQt4.QtGui import QLineEdit
+from PyQt4.QtGui import QShortcut
 
 import lizard_connector
 # Initialize Qt resources from file resources.py
@@ -206,6 +208,12 @@ class LizardViewer:
                 # Connect the login_button with log_in()
                 self.dockwidget.login_button.clicked.connect(
                     self.log_in)
+                # Login by pressing Enter in user_password_input
+                shortcut_login_enter = QShortcut(
+                    QKeySequence(Qt.Key_Enter),
+                    self.dockwidget.user_password_input)
+                shortcut_login_enter.setContext(Qt.ApplicationShortcut)
+                shortcut_login_enter.activated.connect(self.log_in)
                 # Connect the view_data_button with show_data()
                 self.dockwidget.view_data_button.clicked.connect(
                     self.show_data)
