@@ -24,11 +24,15 @@ The plug-in can be added using one of the following ways:
 
 ## Release
 Make sure you have `zest.releaser` with `qgispluginreleaser` installed. To make a release (also see: [1]):
-* `$ cd /path/to/the/plugin`
-* `$ fullrelease  # NOTE: if it asks you if you want to check out the tag press 'y'.`
+```
+$ cd /path/to/the/plugin`
+$ fullrelease  # NOTE: if it asks you if you want to check out the tag press 'y'.
+```
 
 Manually copy to server:
-* `$ scp LizardViewer.0.1.zip <user.name>@packages-server.example.local:/srv/packages.lizardsystem.nl/var/plugins`
+```
+$ scp LizardViewer.0.1.zip <user.name>@packages-server.example.local:/srv/packages.lizardsystem.nl/var/plugins
+```
 
 ## Tests
 There are currently 4 tests (in the test folder).
@@ -40,4 +44,6 @@ These tests can be run by using `make test` [2].
 ## Notes
 [1]: Under the hood it calls `make zip` (see `Makefile`, the old zip directive is overwritten).
 [2]: Make test uses `nose`. Make sure you have `nose` installed (`pip install nose`). And make sure the plugin dir has the right package name, is `LizardViewer` or else the relative imports won't work correctly. Then run `nosetests` inside the plugin directory:
-`$ nosetests --with-doctest`
+```
+$ nosetests --with-doctest
+```
