@@ -32,16 +32,12 @@ Manually copy to server:
 
 ## Tests
 There are currently 4 tests (in the test folder).
-These tests can be run in two ways:
-
-* Be outside the repository directory and then run test modules independently like this:
-  * `$ python -m unittest LizardViewer.test.test_resources`
-  * `etc.`
-* Test with `nose` test runner. Make sure you have `nose` installed (`pip install nose`). And make sure the plugin dir has the right package name, is `LizardViewer` or else the relative imports won't work correctly. Then run `nosetests` inside the plugin directory:
-`$ nosetests --with-doctest`
+These tests can be run by using `make test` [2].
 
 ## Other interesting QGIS plug-ins:
 * [3Di QGIS plug-in](https://github.com/nens/threedi-qgis-plugin)
 
 ## Notes
-[1]: Under the hood it calls `make zip` which is modified a bit (see `Makefile`, old zip directive is still avaiable) so that it doesn't copy everything to your QGIS plugin directory.
+[1]: Under the hood it calls `make zip` (see `Makefile`, the old zip directive is overwritten).
+[2]: Make test uses `nose`. Make sure you have `nose` installed (`pip install nose`). And make sure the plugin dir has the right package name, is `LizardViewer` or else the relative imports won't work correctly. Then run `nosetests` inside the plugin directory:
+`$ nosetests --with-doctest`
