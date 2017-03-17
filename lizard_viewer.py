@@ -261,18 +261,7 @@ class LizardViewer:
             # Show the dialog
             self.login_dialog.show()
         else:
-            # Reset the username
-            self.username = None
-            # Reset the Data type combobox
-            self.dockwidget.reset_datatypes_combobox()
-            # Remove the organisations from the combobox
-            self.dockwidget.remove_organisation_options()
-            # Set the text of the login button to log in
-            self.dockwidget.login_button_private.setText("Log in")
-            # Show a log out message in the status bars
-            self.dockwidget.set_all_status_bars_text("Logged out.")
-            # Go to the public data tab
-            self.dockwidget.change_tab(TAB_PUBLIC_DATA)
+            self.log_out()
 
     def log_in(self):
         """Function to handle logging in."""
@@ -310,3 +299,18 @@ class LizardViewer:
             # Show log in error in the status bar
             self.dockwidget.set_all_status_bars_text(
                 "User/password combination incorrect.")
+
+    def log_out(self):
+        """Function to log out the user."""
+        # Reset the username
+        self.username = None
+        # Reset the Data type combobox
+        self.dockwidget.reset_datatypes_combobox()
+        # Remove the organisations from the combobox
+        self.dockwidget.remove_organisation_options()
+        # Set the text of the login button to log in
+        self.dockwidget.login_button_private.setText("Log in")
+        # Show a log out message in the status bars
+        self.dockwidget.set_all_status_bars_text("Logged out.")
+        # Go to the public data tab
+        self.dockwidget.change_tab(TAB_PUBLIC_DATA)
