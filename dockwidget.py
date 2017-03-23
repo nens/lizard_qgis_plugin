@@ -7,6 +7,7 @@ from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 
 import lizard_connector
+from .utils.constants import ASSET_TYPES
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dockwidget.ui'))
@@ -35,6 +36,12 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Module for closing the dockwidget."""
         self.closingPlugin.emit()
         event.accept()
+
+    def set_shapefile_name(self, asset_type):
+        """Set shapefile name."""
+        asset_type_index = self.datatypes_combobox.currentIndex()
+        asset_type = ASSET_TYPES[asset_type_index]
+        self.shapefile_save_input.setText(asset_type)
 
     def add_organisation_options(self, username, password):
         """Function to add options to the organisations combobox."""

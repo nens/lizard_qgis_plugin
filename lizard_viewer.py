@@ -20,6 +20,7 @@ from .dockwidget import TAB_LOG_IN
 from .dockwidget import TAB_SELECT_DATA
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
+# from .utils.styler import apply_style
 from .utils.layer import create_layer
 
 
@@ -203,6 +204,9 @@ class LizardViewer:
                     "Lizard Viewer started.")
                 # Go to the select data tab
                 self.dockwidget.change_tab(TAB_SELECT_DATA)
+                # Connect naming the shapefile with the data type combobox
+                self.dockwidget.datatypes_combobox.currentIndexChanged.connect(
+                    self.dockwidget.set_shapefile_name)
                 # Connect the login_button with log_in()
                 self.dockwidget.login_button.clicked.connect(
                     self.log_in)
@@ -224,6 +228,7 @@ class LizardViewer:
         # Get the selected asset_type
         asset_type_index = self.dockwidget.datatypes_combobox.currentIndex()
         asset_type = ASSET_TYPES[asset_type_index]
+        shapefile_name = self.dockwidget.shapefile_save_input.text()
         # Set the status bar text
         self.dockwidget.set_all_status_bars_text(
             "Downloading {}...".format(asset_type))
@@ -231,7 +236,9 @@ class LizardViewer:
         payload = {"page_size": 100}
         list_of_assets = get_data(asset_type, payload)
         # Create a new vector layer
-        self.layer = create_layer(asset_type, list_of_assets)
+        self.layer = create_layer(
+            self, shapefile_name, asset_type, list_of_assets)
+        # self.create_shapefile(asset_type, list_of_assets)
         # Set the status bar text
         self.dockwidget.set_all_status_bars_text(
             "{} downloaded.".format(asset_type.capitalize()))
