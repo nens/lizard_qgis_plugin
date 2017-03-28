@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """Module containing the constants."""
-ASSET_TYPES = ["bridges", "manholes", "outlets", "overflows", "pumpstations",
-               "wastewatertreatmentplants", "weirs"]
-ASSET_GEOMETRY_TYPES = {"pumpstations": "Point", "manholes": "Point",
-                        "bridges": "Point", "outlets": "Point",
-                        "overflows": "Point",
+ASSET_TYPES = ["bridges", "groundwaterstations", "manholes",
+               "measuringstations", "monitoringwells", "outlets", "overflows",
+               "pumpstations", "sluices", "wastewatertreatmentplants", "weirs"]
+ASSET_GEOMETRY_TYPES = {"bridges": "Point", "groundwaterstations": "Point",
+                        "manholes": "Point", "measuringstations": "Point",
+                        "monitoringwells": "Point", "outlets": "Point",
+                        "overflows": "Point", "pumpstations": "Point",
+                        "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
 
 # The base_url used for getting the data (JSON)
