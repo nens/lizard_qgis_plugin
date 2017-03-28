@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>409</height>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>311</width>
-      <height>381</height>
+      <height>331</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -75,7 +75,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>320</y>
+        <y>270</y>
         <width>301</width>
         <height>20</height>
        </rect>
@@ -129,34 +129,11 @@
        <bool>false</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="organisation_label_private">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>170</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Organisation</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="organisation_combobox_private">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>170</y>
-        <width>171</width>
-        <height>27</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QPushButton" name="view_data_button_private">
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>220</y>
+        <y>170</y>
         <width>99</width>
         <height>27</height>
        </rect>
@@ -175,7 +152,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>270</y>
+        <y>220</y>
         <width>99</width>
         <height>27</height>
        </rect>
@@ -283,7 +260,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>320</y>
+        <y>270</y>
         <width>301</width>
         <height>20</height>
        </rect>

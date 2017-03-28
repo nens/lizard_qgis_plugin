@@ -270,21 +270,17 @@ class LizardViewer:
         # Check if the user exists
         try:
             # Get the possible users of the API the user has access to
-            users = lizard_connector.connector.Endpoint(
+            users_endpoint = lizard_connector.connector.Endpoint(
                 username=self.username,
                 password=self.login_dialog.user_password_input.text(),
                 endpoint="users")
-            users_ = users.download()
+            users = users_endpoint.download()
             # Check whether the username and password match with those of
             # the API
-            for key in users_:
-                if key["username"] == self.username:
+            for user in users:
+                if user["username"] == self.username:
                     # Show logged in in the status bar
                     self.dockwidget.set_all_status_bars_text("Logged in.")
-                    # Add organisation options
-                    self.dockwidget.add_organisation_options(
-                        self.username,
-                        self.login_dialog.user_password_input.text())
                     # Go to the Private data tab
                     self.dockwidget.change_tab(TAB_PRIVATE_DATA)
                     # Clear the user info
@@ -306,8 +302,6 @@ class LizardViewer:
         self.username = None
         # Reset the Data type combobox
         self.dockwidget.reset_datatypes_combobox()
-        # Remove the organisations from the combobox
-        self.dockwidget.remove_organisation_options()
         # Set the text of the login button to log in
         self.dockwidget.login_button_private.setText("Log in")
         # Show a log out message in the status bars
