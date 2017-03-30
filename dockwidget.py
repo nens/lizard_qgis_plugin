@@ -7,6 +7,7 @@ from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 
 import lizard_connector
+from .utils.constants import STYLES_ROOT
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dockwidget.ui'))
@@ -48,6 +49,16 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
             self.tabWidget.setCurrentIndex(0)
         elif tab_constant == TAB_PUBLIC_DATA:
             self.tabWidget.setCurrentIndex(1)
+
+    def add_datatypes_to_combobox(self, asset_types):
+        """Add an asterisk for asset types that don't have styling."""
+        for asset_type in asset_types:
+            qml_path = os.path.join(STYLES_ROOT, "{}.qml".format(asset_type))
+            # Check if the QML exists
+            if not os.path.exists(qml_path):
+                asset_type = "{}*".format(asset_type)
+            self.data_type_combobox_private.addItem(asset_type)
+            self.data_type_combobox_public.addItem(asset_type)
 
     def reset_datatypes_combobox(self):
         """Function to reset the data."""

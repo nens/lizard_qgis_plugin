@@ -2,9 +2,7 @@
 """Module for styling the layer."""
 import os.path
 
-# Add reference to layer_styles directory
-STYLES_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                           os.path.pardir, 'layer_styles')
+from .constants import STYLES_ROOT
 
 
 def apply_style(layer, asset_type):
