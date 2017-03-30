@@ -25,12 +25,12 @@ def create_layer(asset_type, list_of_assets):
 
     # Add the layer
     QgsMapLayerRegistry.instance().addMapLayer(layer)
-
+    print 1
     # Add the attributes to the layer
     add_attributes(layer, list_of_assets)
-
+    print 2
     # Add the features to the layer
-    add_features(layer, list_of_assets)
+    add_features(layer, list_of_assets, geometry_type)
 
     # Return the layer
     return layer
@@ -47,7 +47,7 @@ def add_attributes(layer, list_of_assets):
     layer.updateFields()
 
 
-def add_features(layer, list_of_assets):
+def add_features(layer, list_of_assets, geometry_type):
     """Function to add features to the layer."""
     # Create the feature(s)
     layer.startEditing()
@@ -55,9 +55,18 @@ def add_features(layer, list_of_assets):
     for result in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
         geometry = result.pop("geometry")
-        lat = float(geometry['coordinates'][0])
-        lon = float(geometry['coordinates'][1])
-        feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+        if geometry_type is "Point":
+            lat = float(geometry['coordinates'][0])
+            lon = float(geometry['coordinates'][1])
+            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+        elif geometry_type is "LineString":
+            lat1 = float(geometry['coordinates'][0][0])
+            lon1 = float(geometry['coordinates'][0][1])
+            lat2 = float(geometry['coordinates'][1][0])
+            lon2 = float(geometry['coordinates'][1][1])
+            feature.setGeometry(QgsGeometry.fromPolyline([
+                QgsPoint(lat1, lon1),
+                QgsPoint(lat2, lon2)]))
         for attribute, value in result.iteritems():
             feature.setAttribute(attribute, value)
         features.append(feature)
