@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module containing the main file for the QGIS Lizard plug-in"""
+"""Module containing the main file for the QGIS Lizard plug-in."""
 import os.path
 import urllib2
 
@@ -10,14 +10,14 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
-from PyQt4.QtGui import QLineEdit
 
 import lizard_connector
 # Initialize Qt resources from file resources.py
 import resources
 from .dockwidget import LizardViewerDockWidget
-from .dockwidget import TAB_LOG_IN
-from .dockwidget import TAB_SELECT_DATA
+from .dockwidget import TAB_PRIVATE_DATA
+from .dockwidget import TAB_PUBLIC_DATA
+from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
@@ -61,8 +61,8 @@ class LizardViewer:
 
         self.pluginIsActive = False
         self.dockwidget = None
-
     # noinspection PyMethodMayBeStatic
+
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
 
@@ -158,6 +158,7 @@ class LizardViewer:
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
         self.username = None
+        self.login_dialog = LogInDialog()
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed."""
@@ -193,25 +194,27 @@ class LizardViewer:
             if self.dockwidget is None:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = LizardViewerDockWidget()
-                # Password is shown in asterisks
-                self.dockwidget.user_password_input.setEchoMode(
-                    QLineEdit.Password)
-                # Add the asset types to the data_types combobox
-                self.dockwidget.datatypes_combobox.addItems(ASSET_TYPES)
+                # Add the asset types to the data type comboboxes
+                self.dockwidget.data_type_combobox_private.addItems(
+                    ASSET_TYPES)
+                self.dockwidget.data_type_combobox_public.addItems(ASSET_TYPES)
                 # Set the status bar text
                 self.dockwidget.set_all_status_bars_text(
                     "Lizard Viewer started.")
                 # Go to the select data tab
-                self.dockwidget.change_tab(TAB_SELECT_DATA)
-                # Connect the login_button with log_in()
-                self.dockwidget.login_button.clicked.connect(
-                    self.log_in)
-                # Connect the view_data_button with show_data()
-                self.dockwidget.view_data_button.clicked.connect(
-                    self.show_data)
-                # Connect the login_button with log_out()
-                self.dockwidget.logout_button.clicked.connect(
-                    self.log_out)
+                self.dockwidget.change_tab(TAB_PRIVATE_DATA)
+                # Connect the login button of the private data tab with
+                # the login dialog
+                self.dockwidget.login_button_private.clicked.connect(
+                    self.show_login_dialog)
+                # Connect the View data buttons with the show data functions
+                self.dockwidget.view_data_button_private.clicked.connect(
+                    self.show_private_data)
+                self.dockwidget.view_data_button_public.clicked.connect(
+                    self.show_public_data)
+                # Connect the log_in function to the Log in button of the
+                # Log in dialog
+                self.login_dialog.log_in_button.clicked.connect(self.log_in)
             # connect to provide cleanup on closing of dockwidget
             self.dockwidget.closingPlugin.connect(self.onClosePlugin)
             # show the dockwidget
@@ -219,10 +222,22 @@ class LizardViewer:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-    def show_data(self):
+    def show_private_data(self):
+        """Show private data."""
+        self.show_data("private")
+
+    def show_public_data(self):
+        """Show public data."""
+        self.show_data("public")
+
+    def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
-        # Get the selected asset_type
-        asset_type_index = self.dockwidget.datatypes_combobox.currentIndex()
+        # Get the selected public or private asset_type
+        if public_or_private is "private":
+            data_type_combobox = self.dockwidget.data_type_combobox_private
+        else:
+            data_type_combobox = self.dockwidget.data_type_combobox_public
+        asset_type_index = data_type_combobox.currentIndex()
         asset_type = ASSET_TYPES[asset_type_index]
         # Set the status bar text
         self.dockwidget.set_all_status_bars_text(
@@ -236,57 +251,60 @@ class LizardViewer:
         self.dockwidget.set_all_status_bars_text(
             "{} downloaded.".format(asset_type.capitalize()))
 
+    def show_login_dialog(self):
+        """Function to show the login dialog."""
+        # Check whether the user is logged in
+        if self.username is None:
+            # The user_name_input QLineEdit becomes the active part of the
+            # login dialog
+            self.login_dialog.user_name_input.setFocus()
+            # Show the dialog
+            self.login_dialog.show()
+        else:
+            self.log_out()
+
     def log_in(self):
-        """Handle the log in."""
-        self.username = None
-        # Reset the Data type combobox
-        self.dockwidget.reset_datatypes_combobox()
-        # Remove the organisations from the combobox
-        self.dockwidget.remove_organisation_options()
+        """Function to handle logging in."""
         # Get the username
-        self.username = self.dockwidget.user_name_input.text()
+        self.username = self.login_dialog.user_name_input.text()
         # Check if the user exists
         try:
             # Get the possible users of the API the user has access to
-            users = lizard_connector.connector.Endpoint(
+            users_endpoint = lizard_connector.connector.Endpoint(
                 username=self.username,
-                password=self.dockwidget.user_password_input.text(),
+                password=self.login_dialog.user_password_input.text(),
                 endpoint="users")
-            users_ = users.download()
+            users = users_endpoint.download()
             # Check whether the username and password match with those of
             # the API
-            for key in users_:
-                if key["username"] == self.username:
+            for user in users:
+                if user["username"] == self.username:
                     # Show logged in in the status bar
                     self.dockwidget.set_all_status_bars_text("Logged in.")
-                    # Add organisation options
-                    self.dockwidget.add_organisation_options(
-                        self.username,
-                        self.dockwidget.user_password_input.text())
-                    # Go to the select data tab
-                    self.dockwidget.change_tab(TAB_SELECT_DATA)
+                    # Go to the Private data tab
+                    self.dockwidget.change_tab(TAB_PRIVATE_DATA)
                     # Clear the user info
-                    self.dockwidget.clear_user_info()
+                    self.login_dialog.clear_user_info()
+                    # Close the dialog
+                    self.login_dialog.close()
+                    # Set the login button text to log out
+                    self.dockwidget.login_button_private.setText("Log out")
         except urllib2.HTTPError:
-            # Show log in error in the status bar
+            # Reset the username
             self.username = None
+            # Show log in error in the status bar
             self.dockwidget.set_all_status_bars_text(
                 "User/password combination incorrect.")
 
     def log_out(self):
-        """Handle the log out."""
-        # Delete the username and password if they exist
-        if self.username is not None:
-            self.username = None
-            # Show logged out in the status bar
-            self.dockwidget.set_all_status_bars_text("Logged out.")
-            # Go to the log in tab
-            self.dockwidget.change_tab(TAB_LOG_IN)
-        else:
-            self.dockwidget.set_all_status_bars_text("User not found.")
-        # Clear the user info
-        self.dockwidget.clear_user_info()
+        """Function to log out the user."""
+        # Reset the username
+        self.username = None
         # Reset the Data type combobox
         self.dockwidget.reset_datatypes_combobox()
-        # Remove the organisations from the combobox
-        self.dockwidget.remove_organisation_options()
+        # Set the text of the login button to log in
+        self.dockwidget.login_button_private.setText("Log in")
+        # Show a log out message in the status bars
+        self.dockwidget.set_all_status_bars_text("Logged out.")
+        # Go to the public data tab
+        self.dockwidget.change_tab(TAB_PUBLIC_DATA)
