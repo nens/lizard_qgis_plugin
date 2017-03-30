@@ -25,10 +25,10 @@ def create_layer(asset_type, list_of_assets):
 
     # Add the layer
     QgsMapLayerRegistry.instance().addMapLayer(layer)
-    print 1
+
     # Add the attributes to the layer
     add_attributes(layer, list_of_assets)
-    print 2
+
     # Add the features to the layer
     add_features(layer, list_of_assets, geometry_type)
 
