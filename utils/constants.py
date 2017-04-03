@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """Module containing the constants."""
-ASSET_TYPES = ["bridges", "culverts", "leveecrosssections", "manholes",
-               "outlets", "overflows", "pipes", "pressurepipes",
-               "pumpstations", "wastewatertreatmentplants", "weirs"]
-ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
-                        "leveecrosssections": "LineString",
-                        "manholes": "Point", "pipes": "LineString",
-                        "pressurepipes": "LineString", "pumpstations": "Point",
+ASSET_TYPES = ["bridges", "fixeddrainagelevelareas", "manholes", "outlets",
+               "overflows", "pumpstations", "wastewatertreatmentplants",
+               "weirs"]
+ASSET_GEOMETRY_TYPES = {"bridges": "Point",
+                        "fixeddrainagelevelareas": "Polygon",
+                        "manholes": "Point", "pumpstations": "Point",
                         "outlets": "Point", "overflows": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
 

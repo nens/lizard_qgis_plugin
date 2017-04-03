@@ -30,7 +30,7 @@ def create_layer(asset_type, list_of_assets):
     add_attributes(layer, list_of_assets)
 
     # Add the features to the layer
-    add_features(layer, list_of_assets, geometry_type)
+    add_features(layer, list_of_assets)
 
     # Return the layer
     return layer
@@ -47,27 +47,39 @@ def add_attributes(layer, list_of_assets):
     layer.updateFields()
 
 
-def add_features(layer, list_of_assets, geometry_type):
+def add_features(layer, list_of_assets):
     """Function to add features to the layer."""
     # Create the feature(s)
     layer.startEditing()
     features = []
-    for result in list_of_assets:
+    for asset in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
-        geometry = result.pop("geometry")
-        if geometry_type is "Point":
+        geometry = asset.pop("geometry")
+        if str(geometry["type"]) == "Point":
             lat = float(geometry['coordinates'][0])
             lon = float(geometry['coordinates'][1])
             feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
-        elif geometry_type is "LineString":
-            lat1 = float(geometry['coordinates'][0][0])
-            lon1 = float(geometry['coordinates'][0][1])
-            lat2 = float(geometry['coordinates'][1][0])
-            lon2 = float(geometry['coordinates'][1][1])
-            feature.setGeometry(QgsGeometry.fromPolyline([
-                QgsPoint(lat1, lon1),
-                QgsPoint(lat2, lon2)]))
-        for attribute, value in result.iteritems():
+        elif str(geometry["type"]) == "Polygon":
+            list_of_points = []
+            for points in geometry["coordinates"]:
+                for point in points:
+                    lat = float(point[0])
+                    lon = float(point[1])
+                    list_of_points.append(QgsPoint(lat, lon))
+                feature.setGeometry(QgsGeometry.fromPolygon([list_of_points]))
+        elif str(geometry["type"]) == "MultiPolygon":
+            list_of_polygons = []
+            for polygons in geometry["coordinates"]:
+                for polygon in polygons:
+                    list_of_points = []
+                    for point in polygon:
+                        lat = float(point[0])
+                        lon = float(point[1])
+                        list_of_points.append(QgsPoint(lat, lon))
+                    list_of_polygons.append(list_of_points)
+                feature.setGeometry(QgsGeometry.fromMultiPolygon(
+                    [list_of_polygons]))
+        for attribute, value in asset.iteritems():
             feature.setAttribute(attribute, value)
         features.append(feature)
 
