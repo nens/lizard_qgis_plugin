@@ -15,6 +15,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 TAB_PRIVATE_DATA = "Private data"
 TAB_PUBLIC_DATA = "Public data"
 
+# Mark assets that have no styling.
+UNSTYLED_POSTFIX = " (not styled)"
+
 
 class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
     """Module for creating the dockwidget."""
@@ -57,7 +60,7 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
             svg_path = os.path.join(STYLES_ROOT, "{}.svg".format(asset_type))
             # Check if the QML exists
             if not os.path.exists(qml_path) and not os.path.exists(svg_path):
-                asset_type = "{}*".format(asset_type)
+                asset_type = "{}{}".format(asset_type, UNSTYLED_POSTFIX)
             self.data_type_combobox_private.addItem(asset_type)
             self.data_type_combobox_public.addItem(asset_type)
 
