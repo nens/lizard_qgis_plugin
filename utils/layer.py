@@ -20,7 +20,7 @@ def create_layer(asset_type, list_of_assets):
     layer = QgsVectorLayer("{}?crs={}".format(geometry_type, WGS84),
                            asset_type, "memory")
 
-    # Add Lizard style (SVG)
+    # Add Lizard style (SVG/ QML)
     apply_style(layer, asset_type)
 
     # Add the layer
@@ -36,10 +36,16 @@ def create_layer(asset_type, list_of_assets):
     return layer
 
 
-def add_attributes(layer, list_of_assets):
-    """Function to add attributes to the layer."""
+def add_attributes(layer, assets):
+    """
+    Function to add attributes to the layer.
+
+    Arguments:
+        qgis_layer layer: This is a layer in QGIS.
+        list assets: This is a list of assets (GeoJSONs).
+    """
     # Create the attributes
-    fields = [QgsField(attr, QVariant.String) for attr in list_of_assets[
+    fields = [QgsField(attr, QVariant.String) for attr in assets[
         0] if attr != "geometry"]
 
     # Add the attributes to the layer
@@ -47,18 +53,24 @@ def add_attributes(layer, list_of_assets):
     layer.updateFields()
 
 
-def add_features(layer, list_of_assets):
-    """Function to add features to the layer."""
-    # Create the feature(s)
+def add_features(layer, assets):
+    """
+    Function to add features to the layer.
+
+    Arguments:
+        qgis_layer layer: This is a layer in QGIS.
+        list assets: This is a list of assets (GeoJSONs).
+    """
+    # Create the features
     layer.startEditing()
     features = []
-    for result in list_of_assets:
+    for asset in assets:
         feature = QgsFeature(layer.pendingFields())
-        geometry = result.pop("geometry")
+        geometry = asset.pop("geometry")
         lat = float(geometry['coordinates'][0])
         lon = float(geometry['coordinates'][1])
         feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
-        for attribute, value in result.iteritems():
+        for attribute, value in asset.iteritems():
             feature.setAttribute(attribute, value)
         features.append(feature)
 

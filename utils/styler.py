@@ -4,21 +4,24 @@ import os.path
 
 from qgis.core import QgsSvgMarkerSymbolLayerV2
 
-# Add reference to layer_styles directory
-STYLES_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                           os.path.pardir, 'layer_styles')
+from .constants import STYLES_ROOT
 
 
 def apply_style(layer, asset_type):
-    """Apply styling to a layer (SVG)."""
-    # Create the SVG style
-    svg_style = {}
+    """Apply styling to a layer (SVG/ QML)."""
+    # Create the path to the styling (SVG/ QML).
+    qml_path = os.path.join(STYLES_ROOT, "{}.qml".format(asset_type))
     svg_path = os.path.join(STYLES_ROOT, "{}.svg".format(asset_type))
-    if os.path.exists(svg_path):
-        svg_style["name"] = svg_path
-
-        # Create a symbol layer with the SVG style
-        symbol_layer = QgsSvgMarkerSymbolLayerV2.create(svg_style)
-
-        # Apply the symbol layer to the layer
-        layer.rendererV2().symbols()[0].changeSymbolLayer(0, symbol_layer)
+    # Check if the QML exists
+    if os.path.exists(qml_path):
+        # Add the QML style to the layer
+        layer.loadNamedStyle(qml_path)
+    # Check if the SVG exists
+    elif os.path.exists(svg_path):
+            # Create the SVG style
+            svg_style = {}
+            svg_style["name"] = svg_path
+            # Create a symbol layer with the SVG style
+            symbol_layer = QgsSvgMarkerSymbolLayerV2.create(svg_style)
+            # Apply the symbol layer to the layer
+            layer.rendererV2().symbols()[0].changeSymbolLayer(0, symbol_layer)
