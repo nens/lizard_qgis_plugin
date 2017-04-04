@@ -20,7 +20,7 @@ def create_layer(asset_type, list_of_assets):
     layer = QgsVectorLayer("{}?crs={}".format(geometry_type, WGS84),
                            asset_type, "memory")
 
-    # Add Lizard style (SVG)
+    # Add Lizard style (QML)
     apply_style(layer, asset_type)
 
     # Add the layer

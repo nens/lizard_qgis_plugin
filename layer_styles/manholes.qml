@@ -42,7 +42,7 @@
           <prop k="angle" v="0"/>
           <prop k="color" v="0,0,0,255"/>
           <prop k="horizontal_anchor_point" v="1"/>
-          <prop k="name" v="/home/madeleine.vanwinkel/Desktop/The_PlugIN/LizardViewer/layer_styles/manholes.svg"/>
+          <prop k="name" v="manholes.svg"/>
           <prop k="offset" v="0,0"/>
           <prop k="offset_map_unit_scale" v="0,0,0,0,0,0"/>
           <prop k="offset_unit" v="MM"/>
