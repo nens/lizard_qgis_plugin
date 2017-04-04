@@ -3,14 +3,19 @@
 
 import os.path
 
-ASSET_TYPES = ["bridges", "groundwaterstations", "manholes",
-               "measuringstations", "monitoringwells", "outlets", "overflows",
-               "pumpstations", "sluices", "wastewatertreatmentplants", "weirs"]
-ASSET_GEOMETRY_TYPES = {"bridges": "Point", "groundwaterstations": "Point",
+ASSET_TYPES = ["bridges", "culverts", "groundwaterstations",
+               "leveecrosssections", "manholes", "measuringstations",
+               "monitoringwells", "outlets", "overflows", "pipes",
+               "pressurepipes", "pumpstations", "sluices",
+               "wastewatertreatmentplants", "weirs"]
+ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
+                        "groundwaterstations": "Point",
+                        "leveecrosssections": "LineString",
                         "manholes": "Point", "measuringstations": "Point",
-                        "monitoringwells": "Point", "outlets": "Point",
-                        "overflows": "Point", "pumpstations": "Point",
-                        "sluices": "Point",
+                        "monitoringwells": "Point", "pipes": "LineString",
+                        "pressurepipes": "LineString", "pumpstations": "Point",
+                        "outlets": "Point", "overflows": "Point",
+                        "pumpstations": "Point", "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
 
 # The base_url used for getting the data (JSON)
