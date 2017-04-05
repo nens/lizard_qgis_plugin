@@ -20,7 +20,7 @@ def create_layer(asset_type, list_of_assets):
     layer = QgsVectorLayer("{}?crs={}".format(geometry_type, WGS84),
                            asset_type, "memory")
 
-    # Add Lizard style (SVG)
+    # Add Lizard style (SVG/ QML)
     apply_style(layer, asset_type)
 
     # Add the layer
@@ -36,10 +36,16 @@ def create_layer(asset_type, list_of_assets):
     return layer
 
 
-def add_attributes(layer, list_of_assets):
-    """Function to add attributes to the layer."""
+def add_attributes(layer, assets):
+    """
+    Function to add attributes to the layer.
+
+    Arguments:
+        qgis_layer layer: This is a layer in QGIS.
+        list assets: This is a list of assets (GeoJSONs).
+    """
     # Create the attributes
-    fields = [QgsField(attr, QVariant.String) for attr in list_of_assets[
+    fields = [QgsField(attr, QVariant.String) for attr in assets[
         0] if attr != "geometry"]
 
     # Add the attributes to the layer
@@ -59,6 +65,14 @@ def add_features(layer, list_of_assets):
             lat = float(geometry['coordinates'][0])
             lon = float(geometry['coordinates'][1])
             feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
+        elif str(geometry["type"]) == "LineString":
+            lat1 = float(geometry['coordinates'][0][0])
+            lon1 = float(geometry['coordinates'][0][1])
+            lat2 = float(geometry['coordinates'][1][0])
+            lon2 = float(geometry['coordinates'][1][1])
+            feature.setGeometry(QgsGeometry.fromPolyline([
+                QgsPoint(lat1, lon1),
+                QgsPoint(lat2, lon2)]))
         elif str(geometry["type"]) == "Polygon":
             list_of_points = []
             for points in geometry["coordinates"]:

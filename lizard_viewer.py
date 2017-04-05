@@ -195,9 +195,7 @@ class LizardViewer:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = LizardViewerDockWidget()
                 # Add the asset types to the data type comboboxes
-                self.dockwidget.data_type_combobox_private.addItems(
-                    ASSET_TYPES)
-                self.dockwidget.data_type_combobox_public.addItems(ASSET_TYPES)
+                self.dockwidget.add_datatypes_to_combobox(ASSET_TYPES)
                 # Set the status bar text
                 self.dockwidget.set_all_status_bars_text(
                     "Lizard Viewer started.")
