@@ -8,7 +8,7 @@ from qgis.core import QgsVectorLayer
 
 from .constants import ASSET_GEOMETRY_TYPES
 from .constants import WGS84
-from .geometry import apply_geometry
+from .geometry import create_geometry
 from .styler import apply_style
 
 
@@ -60,12 +60,24 @@ def add_features(layer, list_of_assets):
     for asset in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
         geometry = asset["geometry"]
-        apply_geometry(feature, geometry)
-        for attribute, value in asset.iteritems():
-            if attribute != "geometry":
-                feature.setAttribute(attribute, value)
+        qgs_geometry = create_geometry(feature, geometry)
+        feature.setGeometry(qgs_geometry)
+        set_attributes(feature, asset)
         features.append(feature)
 
     # Add the features to the layer
     layer.dataProvider().addFeatures(features)
     layer.commitChanges()
+
+
+def set_attributes(feature, asset):
+    """
+    Function to set the attributes of a QGIS feature.
+
+    Arguments:
+        feature (QgsFeature): A QGIS feature to add attributes to.
+        asset (JSON): A JSON, containing data about the asset.
+    """
+    for attribute, value in asset.iteritems():
+        if attribute != "geometry":
+            feature.setAttribute(attribute, value)
