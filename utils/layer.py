@@ -60,7 +60,7 @@ def add_features(layer, list_of_assets):
     for asset in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
         geometry = asset["geometry"]
-        qgs_geometry = create_geometry(feature, geometry)
+        qgs_geometry = create_geometry(geometry)
         feature.setGeometry(qgs_geometry)
         set_attributes(feature, asset)
         features.append(feature)
