@@ -3,12 +3,13 @@
 
 import os.path
 
-ASSET_TYPES = ["bridges", "culverts", "groundwaterstations",
-               "leveecrosssections", "manholes", "measuringstations",
-               "monitoringwells", "outlets", "overflows", "pipes",
-               "pressurepipes", "pumpstations", "sluices",
+ASSET_TYPES = ["bridges", "culverts", "fixeddrainagelevelareas",
+               "groundwaterstations", "leveecrosssections", "manholes",
+               "measuringstations", "monitoringwells", "outlets", "overflows",
+               "pipes", "pressurepipes", "pumpstations", "sluices",
                "wastewatertreatmentplants", "weirs"]
 ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
+                        "fixeddrainagelevelareas": "Polygon",
                         "groundwaterstations": "Point",
                         "leveecrosssections": "LineString",
                         "manholes": "Point", "measuringstations": "Point",

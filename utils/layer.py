@@ -3,13 +3,12 @@
 from PyQt4.QtCore import QVariant
 from qgis.core import QgsFeature
 from qgis.core import QgsField
-from qgis.core import QgsGeometry
 from qgis.core import QgsMapLayerRegistry
-from qgis.core import QgsPoint
 from qgis.core import QgsVectorLayer
 
 from .constants import ASSET_GEOMETRY_TYPES
 from .constants import WGS84
+from .geometry import create_geometry
 from .styler import apply_style
 
 
@@ -30,7 +29,7 @@ def create_layer(asset_type, list_of_assets):
     add_attributes(layer, list_of_assets)
 
     # Add the features to the layer
-    add_features(layer, list_of_assets, geometry_type)
+    add_features(layer, list_of_assets)
 
     # Return the layer
     return layer
@@ -53,36 +52,32 @@ def add_attributes(layer, assets):
     layer.updateFields()
 
 
-def add_features(layer, assets, geometry_type):
-    """
-    Function to add features to the layer.
-
-    Arguments:
-        qgis_layer layer: This is a layer in QGIS.
-        list assets: This is a list of assets (GeoJSONs).
-    """
-    # Create the features
+def add_features(layer, list_of_assets):
+    """Function to add features to the layer."""
+    # Create the feature(s)
     layer.startEditing()
     features = []
-    for asset in assets:
+    for asset in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
-        geometry = asset.pop("geometry")
-        if geometry_type is "Point":
-            lat = float(geometry['coordinates'][0])
-            lon = float(geometry['coordinates'][1])
-            feature.setGeometry(QgsGeometry.fromPoint(QgsPoint(lat, lon)))
-        elif geometry_type is "LineString":
-            lat1 = float(geometry['coordinates'][0][0])
-            lon1 = float(geometry['coordinates'][0][1])
-            lat2 = float(geometry['coordinates'][1][0])
-            lon2 = float(geometry['coordinates'][1][1])
-            feature.setGeometry(QgsGeometry.fromPolyline([
-                QgsPoint(lat1, lon1),
-                QgsPoint(lat2, lon2)]))
-        for attribute, value in asset.iteritems():
-            feature.setAttribute(attribute, value)
+        geometry = asset["geometry"]
+        qgs_geometry = create_geometry(geometry)
+        feature.setGeometry(qgs_geometry)
+        set_attributes(feature, asset)
         features.append(feature)
 
     # Add the features to the layer
     layer.dataProvider().addFeatures(features)
     layer.commitChanges()
+
+
+def set_attributes(feature, asset):
+    """
+    Function to set the attributes of a QGIS feature.
+
+    Arguments:
+        feature (QgsFeature): A QGIS feature to add attributes to.
+        asset (JSON): A JSON, containing data about the asset.
+    """
+    for attribute, value in asset.iteritems():
+        if attribute != "geometry":
+            feature.setAttribute(attribute, value)
