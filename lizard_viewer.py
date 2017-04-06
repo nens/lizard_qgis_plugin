@@ -241,7 +241,7 @@ class LizardViewer:
         self.dockwidget.set_all_status_bars_text(
             "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
-        payload = {"page_size": 100}
+        payload = {"page_size": 5663, "format": "json", "async": "true"}
         list_of_assets = get_data(asset_type, payload)
         # Create a new vector layer
         self.layer = create_layer(asset_type, list_of_assets)
