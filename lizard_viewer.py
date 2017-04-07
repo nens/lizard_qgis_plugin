@@ -157,8 +157,9 @@ class LizardViewer:
             callback=self.run,
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
-        self.username = None
+        self.downloadIsActive = False
         self.login_dialog = LogInDialog()
+        self.username = None
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed."""
@@ -230,23 +231,30 @@ class LizardViewer:
 
     def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
-        # Get the selected public or private asset_type
-        if public_or_private is "private":
-            data_type_combobox = self.dockwidget.data_type_combobox_private
+        # Make sure that no other download is active
+        if self.downloadIsActive is False:
+            self.downloadIsActive = True
+            # Get the selected public or private asset_type
+            if public_or_private is "private":
+                data_type_combobox = self.dockwidget.data_type_combobox_private
+            else:
+                data_type_combobox = self.dockwidget.data_type_combobox_public
+            asset_type_index = data_type_combobox.currentIndex()
+            asset_type = ASSET_TYPES[asset_type_index]
+            # Set the status bar text
+            self.dockwidget.set_all_status_bars_text(
+                "Downloading {}...".format(asset_type))
+            # Get a list with JSONs containing the data from the Lizard API
+            list_of_assets = get_data(self.dockwidget, asset_type)
+            # Create a new vector layer
+            self.layer = create_layer(asset_type, list_of_assets)
+            # Set the status bar text
+            self.dockwidget.set_all_status_bars_text(
+                "{} downloaded.".format(asset_type.capitalize()))
+            self.downloadIsActive = False
         else:
-            data_type_combobox = self.dockwidget.data_type_combobox_public
-        asset_type_index = data_type_combobox.currentIndex()
-        asset_type = ASSET_TYPES[asset_type_index]
-        # Set the status bar text
-        self.dockwidget.set_all_status_bars_text(
-            "Downloading {}...".format(asset_type))
-        # Get a list with JSONs containing the data from the Lizard API
-        list_of_assets = get_data(self.dockwidget, asset_type)
-        # Create a new vector layer
-        self.layer = create_layer(asset_type, list_of_assets)
-        # Set the status bar text
-        self.dockwidget.set_all_status_bars_text(
-            "{} downloaded.".format(asset_type.capitalize()))
+            self.dockwidget.set_all_status_bars_text(
+                "Download has already started.")
 
     def show_login_dialog(self):
         """Function to show the login dialog."""

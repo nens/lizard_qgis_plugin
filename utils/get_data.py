@@ -55,7 +55,7 @@ def get_data(dockwidget, asset_type):
             for result in result_data["results"]:
                 results.append(result)
         elif task_status == TASK_STATUS_FAILURE:
-            dockwidget.set_all_status_bars("Task failure.")
+            dockwidget.set_all_status_bars_text("Task failure.")
 
         # Get the results from the JSON
         current_amount += DOWNLOAD_LIMIT
