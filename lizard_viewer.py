@@ -160,6 +160,7 @@ class LizardViewer:
         self.downloadIsActive = False
         self.login_dialog = LogInDialog()
         self.username = None
+        self.password = None
 
     def onClosePlugin(self):
         """Cleanup necessary items here when plugin dockwidget is closed."""
@@ -245,7 +246,8 @@ class LizardViewer:
             self.dockwidget.set_all_status_bars_text(
                 "Downloading {}...".format(asset_type))
             # Get a list with JSONs containing the data from the Lizard API
-            list_of_assets = get_data(self.dockwidget, asset_type)
+            list_of_assets = get_data(self.dockwidget, self.username,
+                                      self.password, asset_type)
             # Create a new vector layer
             self.layer = create_layer(asset_type, list_of_assets)
             # Set the status bar text
@@ -272,12 +274,14 @@ class LizardViewer:
         """Function to handle logging in."""
         # Get the username
         self.username = self.login_dialog.user_name_input.text()
+        # Get the password
+        self.password = self.login_dialog.user_password_input.text()
         # Check if the user exists
         try:
             # Get the possible users of the API the user has access to
             users_endpoint = lizard_connector.connector.Endpoint(
                 username=self.username,
-                password=self.login_dialog.user_password_input.text(),
+                password=self.password,
                 endpoint="users")
             users = users_endpoint.download()
             # Check whether the username and password match with those of

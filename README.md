@@ -3,8 +3,7 @@ QGIS plug-in for viewing data from Lizard in QGIS.
 
 ## Features
 * Log in with Lizard account
-* Show organisations of user
-* View the first 100 point assets as memory layer (of assets type bridges, manholes, outlets, overflows, wastewatertreatmentplants or weirs)
+* View all the assets of a certain asset type (all private data upon login, or all public data)
 * Log out
 
 ## Requirements
