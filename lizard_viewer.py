@@ -231,13 +231,13 @@ class LizardViewer:
 
     def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
+        # Get the selected public or private asset_type
         if public_or_private is "private":
             data_type_combobox = self.dockwidget.data_type_combobox_private
         else:
             data_type_combobox = self.dockwidget.data_type_combobox_public
         asset_type_index = data_type_combobox.currentIndex()
         asset_type = ASSET_TYPES[asset_type_index]
-        # Get the selected public or private asset_type
         # Set the status bar text
         self.dockwidget.set_all_status_bars_text(
             "Downloading {}...".format(asset_type))
