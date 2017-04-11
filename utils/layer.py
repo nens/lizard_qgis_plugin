@@ -12,7 +12,7 @@ from .geometry import create_geometry
 from .styler import apply_style
 
 
-def create_layer(asset_type, list_of_assets):
+def create_layer(asset_type, list_of_assets, dockwidget):
     """Function to create a new (memory) layer."""
     # Create the layer
     geometry_type = ASSET_GEOMETRY_TYPES[asset_type]
@@ -29,7 +29,7 @@ def create_layer(asset_type, list_of_assets):
     add_attributes(layer, list_of_assets)
 
     # Add the features to the layer
-    add_features(layer, list_of_assets)
+    add_features(layer, list_of_assets, dockwidget)
 
     # Return the layer
     return layer
@@ -52,16 +52,20 @@ def add_attributes(layer, assets):
     layer.updateFields()
 
 
-def add_features(layer, list_of_assets):
+def add_features(layer, list_of_assets, dockwidget):
     """Function to add features to the layer."""
     # Create the feature(s)
     layer.startEditing()
     features = []
     for asset in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
-        geometry = asset["geometry"]
-        qgs_geometry = create_geometry(geometry)
-        feature.setGeometry(qgs_geometry)
+        try:
+            geometry = asset["geometry"]
+            qgs_geometry = create_geometry(geometry)
+            feature.setGeometry(qgs_geometry)
+        except TypeError:
+            dockwidget.set_all_status_bars_text(
+                "Id {} has no geometry.".format(asset['id']))
         set_attributes(feature, asset)
         features.append(feature)
 

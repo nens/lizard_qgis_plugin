@@ -157,7 +157,6 @@ class LizardViewer:
             callback=self.run,
             add_to_toolbar=True,
             parent=self.iface.mainWindow())
-        self.downloadIsActive = False
         self.login_dialog = LogInDialog()
         self.username = None
         self.password = None
@@ -232,31 +231,24 @@ class LizardViewer:
 
     def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
-        # Make sure that no other download is active
-        if self.downloadIsActive is False:
-            self.downloadIsActive = True
-            # Get the selected public or private asset_type
-            if public_or_private is "private":
-                data_type_combobox = self.dockwidget.data_type_combobox_private
-            else:
-                data_type_combobox = self.dockwidget.data_type_combobox_public
-            asset_type_index = data_type_combobox.currentIndex()
-            asset_type = ASSET_TYPES[asset_type_index]
-            # Set the status bar text
-            self.dockwidget.set_all_status_bars_text(
-                "Downloading {}...".format(asset_type))
-            # Get a list with JSONs containing the data from the Lizard API
-            list_of_assets = get_data(self.dockwidget, self.username,
-                                      self.password, asset_type)
-            # Create a new vector layer
-            self.layer = create_layer(asset_type, list_of_assets)
-            # Set the status bar text
-            self.dockwidget.set_all_status_bars_text(
-                "{} downloaded.".format(asset_type.capitalize()))
-            self.downloadIsActive = False
+        if public_or_private is "private":
+            data_type_combobox = self.dockwidget.data_type_combobox_private
         else:
-            self.dockwidget.set_all_status_bars_text(
-                "Download has already started.")
+            data_type_combobox = self.dockwidget.data_type_combobox_public
+        asset_type_index = data_type_combobox.currentIndex()
+        asset_type = ASSET_TYPES[asset_type_index]
+        # Get the selected public or private asset_type
+        # Set the status bar text
+        self.dockwidget.set_all_status_bars_text(
+            "Downloading {}...".format(asset_type))
+        # Get a list with JSONs containing the data from the Lizard API
+        list_of_assets = get_data(self.dockwidget, self.username,
+                                  self.password, asset_type)
+        # Create a new vector layer
+        create_layer(asset_type, list_of_assets, self.dockwidget)
+        # Set the status bar text
+        self.dockwidget.set_all_status_bars_text(
+            "{} downloaded.".format(asset_type.capitalize()))
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
@@ -299,16 +291,18 @@ class LizardViewer:
                     # Set the login button text to log out
                     self.dockwidget.login_button_private.setText("Log out")
         except urllib2.HTTPError:
-            # Reset the username
+            # Reset the user credentials
             self.username = None
+            self.password = None
             # Show log in error in the status bar
             self.dockwidget.set_all_status_bars_text(
                 "User/password combination incorrect.")
 
     def log_out(self):
         """Function to log out the user."""
-        # Reset the username
+        # Reset the user credentials
         self.username = None
+        self.password = None
         # Reset the Data type combobox
         self.dockwidget.reset_datatypes_combobox()
         # Set the text of the login button to log in
