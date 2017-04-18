@@ -3,7 +3,6 @@
 import os.path
 import urllib2
 
-# from qgis.utils import iface
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
 from PyQt4.QtCore import Qt

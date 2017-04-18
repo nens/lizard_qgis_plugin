@@ -3,7 +3,6 @@
 
 import os.path
 
-AREA_FILTERS = ["Current view", "All data"]
 ASSET_TYPES = ["bridges", "culverts", "fixeddrainagelevelareas",
                "groundwaterstations", "leveecrosssections", "manholes",
                "measuringstations", "monitoringwells", "outlets", "overflows",
@@ -29,5 +28,3 @@ STYLES_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 
 # Add the reference to the CRS used in the Lizard client
 WGS84 = "EPSG:4326"
-
-Z_DEFAULT = 0
