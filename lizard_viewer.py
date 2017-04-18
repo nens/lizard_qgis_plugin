@@ -270,7 +270,7 @@ class LizardViewer:
             # Get the possible users of the API the user has access to
             users_endpoint = lizard_connector.connector.Endpoint(
                 username=self.username,
-                password=self.login_dialog.user_password_input.text(),
+                password=str(self.login_dialog.user_password_input.text()),
                 endpoint="users")
             users = users_endpoint.download()
             # Check whether the username and password match with those of
