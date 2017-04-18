@@ -6,7 +6,6 @@ import os
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 
-import lizard_connector
 from .utils.constants import STYLES_ROOT
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
