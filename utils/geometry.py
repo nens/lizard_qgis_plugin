@@ -25,22 +25,25 @@ def create_geometry(geometry):
             list_of_points.append(QgsPoint(lat, lon))
         return QgsGeometry.fromPolyline(list_of_points)
     elif geometry_type == "Polygon":
-        list_of_points = []
-        for polygon in geometry["coordinates"]:
-            for point in polygon:
+        list_of_polygon_boundaries = []
+        for polygon_boundary in geometry["coordinates"]:
+            list_of_points = []
+            for point in polygon_boundary:
                 lat = float(point[0])
                 lon = float(point[1])
                 list_of_points.append(QgsPoint(lat, lon))
-            return QgsGeometry.fromPolygon([list_of_points])
+            list_of_polygon_boundaries.append(list_of_points)
+        return QgsGeometry.fromPolygon(list_of_polygon_boundaries)
     elif geometry_type == "MultiPolygon":
         list_of_polygons = []
-        for polygons in geometry["coordinates"]:
-            for polygon in polygons:
+        for polygon in geometry["coordinates"]:
+            list_of_polygon_boundaries = []
+            for polygon_boundary in polygon:
                 list_of_points = []
-                for point in polygon:
+                for point in polygon_boundary:
                     lat = float(point[0])
                     lon = float(point[1])
                     list_of_points.append(QgsPoint(lat, lon))
-                list_of_polygons.append(
-                    QgsGeometry.fromPolygon([list_of_points]))
-            return QgsGeometry.fromMultiPolygon([list_of_polygons])
+                list_of_polygon_boundaries.append(list_of_points)
+            list_of_polygons.append(list_of_polygon_boundaries)
+        return QgsGeometry.fromMultiPolygon(list_of_polygons)
