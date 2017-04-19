@@ -41,5 +41,6 @@ def create_geometry(geometry):
                     lat = float(point[0])
                     lon = float(point[1])
                     list_of_points.append(QgsPoint(lat, lon))
-                list_of_polygons.append(list_of_points)
+                list_of_polygons.append(
+                    QgsGeometry.fromPolygon([list_of_points]))
             return QgsGeometry.fromMultiPolygon([list_of_polygons])
