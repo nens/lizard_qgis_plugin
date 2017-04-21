@@ -3,6 +3,7 @@
 
 import os.path
 
+AREA_FILTERS = ["Current view", "All data"]
 ASSET_TYPES = ["bridges", "culverts", "fixeddrainagelevelareas",
                "groundwaterstations", "leveecrosssections", "manholes",
                "measuringstations", "monitoringwells", "outlets", "overflows",

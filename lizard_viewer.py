@@ -3,6 +3,7 @@
 import os.path
 import urllib2
 
+# from qgis.utils import iface
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
 from PyQt4.QtCore import Qt
@@ -18,8 +19,10 @@ from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
+from .utils.constants import AREA_FILTERS
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
+from .utils.get_data import get_bbox
 from .utils.layer import create_layer
 
 
@@ -196,6 +199,8 @@ class LizardViewer:
                 self.dockwidget = LizardViewerDockWidget()
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_datatypes_to_combobox(ASSET_TYPES)
+                # Add the asset types to the data type comboboxes
+                self.dockwidget.add_areafilters_to_combobox()
                 # Set the status bar text
                 self.dockwidget.set_all_status_bars_text(
                     "Lizard Viewer started.")
@@ -242,12 +247,35 @@ class LizardViewer:
             "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
+        # Get the selected public or private area
+        if public_or_private is "private":
+            area_combobox = self.dockwidget.area_combobox_private
+        else:
+            area_combobox = self.dockwidget.area_combobox_public
+        area_index = area_combobox.currentIndex()
+        area_type = AREA_FILTERS[area_index]
+        # Add the bbox to the payload if 'Current view' is selected
+        if area_type == "Current view":
+            if asset_type == "timeseries":
+                payload_bbox_key = "geom__within"
+            else:
+                payload_bbox_key = "in_bbox"
+            lat1, lon1, lat2, lon2 = get_bbox(self.iface)
+            payload[payload_bbox_key] = ','.join([
+                str(lat1), str(lon1), str(lat2), str(lon2)])
+        # Get the data
         list_of_assets = get_data(asset_type, payload)
-        # Create a new vector layer
-        self.layer = create_layer(asset_type, list_of_assets)
-        # Set the status bar text
-        self.dockwidget.set_all_status_bars_text(
-            "{} downloaded.".format(asset_type.capitalize()))
+        # Create a new layer with the asset data
+        if list_of_assets != []:
+            # Create a new vector layer
+            self.layer = create_layer(asset_type, list_of_assets)
+            # Set the status bar text
+            self.dockwidget.set_all_status_bars_text(
+                "{} downloaded.".format(asset_type.capitalize()))
+        else:
+            # Show that there are no assets
+            self.dockwidget.set_all_status_bars_text(
+                "No {} found.".format(asset_type))
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
@@ -270,7 +298,7 @@ class LizardViewer:
             # Get the possible users of the API the user has access to
             users_endpoint = lizard_connector.connector.Endpoint(
                 username=self.username,
-                password=self.login_dialog.user_password_input.text(),
+                password=str(self.login_dialog.user_password_input.text()),
                 endpoint="users")
             users = users_endpoint.download()
             # Check whether the username and password match with those of
