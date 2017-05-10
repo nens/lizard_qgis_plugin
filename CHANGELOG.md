@@ -2,4 +2,6 @@
 
 ## 0.4 (unreleased)
 
-- Add a change log.
+### Features
+- Filter data on current bounding box (also known as extent)
+- Add a change log

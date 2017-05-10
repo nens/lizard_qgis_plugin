@@ -3,6 +3,7 @@
 import os.path
 import urllib2
 
+# from qgis.utils import iface
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
 from PyQt4.QtCore import Qt
@@ -18,8 +19,12 @@ from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
+from .utils.constants import AREA_FILTERS
 from .utils.constants import ASSET_TYPES
+from .utils.constants import PRIVATE
+from .utils.constants import PUBLIC
 from .utils.get_data import get_data
+from .utils.geometry import add_area_filter
 from .utils.layer import create_layer
 
 
@@ -196,6 +201,8 @@ class LizardViewer:
                 self.dockwidget = LizardViewerDockWidget()
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_datatypes_to_combobox(ASSET_TYPES)
+                # Add the asset types to the data type comboboxes
+                self.dockwidget.add_areafilters_to_combobox()
                 # Set the status bar text
                 self.dockwidget.set_all_status_bars_text(
                     "Lizard Viewer started.")
@@ -222,16 +229,16 @@ class LizardViewer:
 
     def show_private_data(self):
         """Show private data."""
-        self.show_data("private")
+        self.show_data(PRIVATE)
 
     def show_public_data(self):
         """Show public data."""
-        self.show_data("public")
+        self.show_data(PUBLIC)
 
     def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
         # Get the selected public or private asset_type
-        if public_or_private is "private":
+        if public_or_private == PRIVATE:
             data_type_combobox = self.dockwidget.data_type_combobox_private
         else:
             data_type_combobox = self.dockwidget.data_type_combobox_public
@@ -242,12 +249,25 @@ class LizardViewer:
             "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
+        # Get the selected public or private area
+        if public_or_private == PRIVATE:
+            area_type = self.dockwidget.area_combobox_private.currentText()
+        else:
+            area_type = self.dockwidget.area_combobox_public.currentText()
+        payload = add_area_filter(self.iface, payload, asset_type, area_type)
+        # Get the data
         list_of_assets = get_data(asset_type, payload)
-        # Create a new vector layer
-        self.layer = create_layer(asset_type, list_of_assets)
-        # Set the status bar text
-        self.dockwidget.set_all_status_bars_text(
-            "{} downloaded.".format(asset_type.capitalize()))
+        # Create a new layer with the asset data
+        if list_of_assets:
+            # Create a new vector layer
+            self.layer = create_layer(asset_type, list_of_assets)
+            # Set the status bar text
+            self.dockwidget.set_all_status_bars_text(
+                "{} downloaded.".format(asset_type.capitalize()))
+        else:
+            # Show that there are no assets
+            self.dockwidget.set_all_status_bars_text(
+                "No {} found.".format(asset_type))
 
     def show_login_dialog(self):
         """Function to show the login dialog."""

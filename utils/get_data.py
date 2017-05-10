@@ -17,11 +17,10 @@ def get_data(asset_type, payload):
         BASE_URL, asset_type,
         payload_encoded)
 
-    # # Get the JSON
+    # Get the JSON
     response = urllib2.urlopen(url)
     r = json.load(response)
     results = r["results"]
-    # count = r["count"]
 
     # Return the results
     return results
