@@ -5,6 +5,11 @@ from qgis.core import QgsCoordinateTransform
 from qgis.core import QgsGeometry
 from qgis.core import QgsPoint
 
+from ..dockwidget import AREA_FILTER_CURRENT_VIEW
+from .constants import PAYLOAD_BBOX_KEY_TIMESERIES
+from .constants import PAYLOAD_BBOX_KEY_OTHER
+from .constants import WGS84
+
 
 def create_geometry(geometry):
     """
@@ -49,6 +54,46 @@ def create_geometry(geometry):
                 list_of_polygon_boundaries.append(list_of_points)
             list_of_polygons.append(list_of_polygon_boundaries)
     return QgsGeometry.fromMultiPolygon(list_of_polygons)
+
+
+def add_area_filter(iface, payload, asset_type, area_type):
+    """Function to add an area filter to the payload."""
+    if area_type == AREA_FILTER_CURRENT_VIEW:
+        if asset_type == "timeseries":
+            payload_bbox_key = PAYLOAD_BBOX_KEY_TIMESERIES
+        else:
+            payload_bbox_key = PAYLOAD_BBOX_KEY_OTHER
+        lat1, lon1, lat2, lon2 = get_bbox(iface)
+        payload[payload_bbox_key] = ','.join([
+            str(lat1), str(lon1), str(lat2), str(lon2)])
+    return payload
+
+
+def get_bbox(iface):
+    """
+    Get a tuple containing the bbox coordinates in the Lizard CRS.
+
+    Args:
+        (interface object) iface: QGIS interface.
+
+    Returns:
+        (tuple) bbox_bounds: A tuple containing the coordinates of
+                             the southwestern and northeastern border
+                             in the Lizard CRS.
+    """
+    # Get QGIS bbox coordinates
+    south_west, north_east = get_bbox_coords(iface)
+    # Get current QGIS CRS
+    source_crs = get_crs(iface.mapCanvas())
+    # Transform bbox from mapCanvas extent crs to the Lizard CRS
+    dest_crs = WGS84
+    south_west_transformed = transform_coord(south_west, source_crs, dest_crs)
+    north_east_transformed = transform_coord(north_east, source_crs, dest_crs)
+    # Return a tuple with the transformed coordinates
+    lat1, lon1 = south_west_transformed
+    lat2, lon2 = north_east_transformed
+    bbox_bounds = (lat1, lon1, lat2, lon2)
+    return bbox_bounds
 
 
 def get_bbox_coords(iface):

@@ -12,6 +12,7 @@ from .utils.constants import STYLES_ROOT
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dockwidget.ui'))
 
+AREA_FILTER_CURRENT_VIEW = "Current view"
 TAB_PRIVATE_DATA = "Private data"
 TAB_PUBLIC_DATA = "Public data"
 

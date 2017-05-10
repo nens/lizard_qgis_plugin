@@ -21,8 +21,10 @@ from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import AREA_FILTERS
 from .utils.constants import ASSET_TYPES
+from .utils.constants import PRIVATE
+from .utils.constants import PUBLIC
 from .utils.get_data import get_data
-from .utils.get_data import get_bbox
+from .utils.geometry import add_area_filter
 from .utils.layer import create_layer
 
 
@@ -227,16 +229,16 @@ class LizardViewer:
 
     def show_private_data(self):
         """Show private data."""
-        self.show_data("private")
+        self.show_data(PRIVATE)
 
     def show_public_data(self):
         """Show public data."""
-        self.show_data("public")
+        self.show_data(PUBLIC)
 
     def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
         # Get the selected public or private asset_type
-        if public_or_private is "private":
+        if public_or_private == PRIVATE:
             data_type_combobox = self.dockwidget.data_type_combobox_private
         else:
             data_type_combobox = self.dockwidget.data_type_combobox_public
@@ -248,25 +250,15 @@ class LizardViewer:
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
         # Get the selected public or private area
-        if public_or_private is "private":
-            area_combobox = self.dockwidget.area_combobox_private
+        if public_or_private == PRIVATE:
+            area_type = self.dockwidget.area_combobox_private.Text()
         else:
-            area_combobox = self.dockwidget.area_combobox_public
-        area_index = area_combobox.currentIndex()
-        area_type = AREA_FILTERS[area_index]
-        # Add the bbox to the payload if 'Current view' is selected
-        if area_type == "Current view":
-            if asset_type == "timeseries":
-                payload_bbox_key = "geom__within"
-            else:
-                payload_bbox_key = "in_bbox"
-            lat1, lon1, lat2, lon2 = get_bbox(self.iface)
-            payload[payload_bbox_key] = ','.join([
-                str(lat1), str(lon1), str(lat2), str(lon2)])
+            area_type = self.dockwidget.area_combobox_public.Text()
+        payload = add_area_filter(self.iface, payload, asset_type, area_type)
         # Get the data
         list_of_assets = get_data(asset_type, payload)
         # Create a new layer with the asset data
-        if list_of_assets != []:
+        if list_of_assets:
             # Create a new vector layer
             self.layer = create_layer(asset_type, list_of_assets)
             # Set the status bar text
