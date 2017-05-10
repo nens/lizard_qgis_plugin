@@ -251,9 +251,9 @@ class LizardViewer:
         payload = {"page_size": 100}
         # Get the selected public or private area
         if public_or_private == PRIVATE:
-            area_type = self.dockwidget.area_combobox_private.Text()
+            area_type = self.dockwidget.area_combobox_private.currentText()
         else:
-            area_type = self.dockwidget.area_combobox_public.Text()
+            area_type = self.dockwidget.area_combobox_public.currentText()
         payload = add_area_filter(self.iface, payload, asset_type, area_type)
         # Get the data
         list_of_assets = get_data(asset_type, payload)
