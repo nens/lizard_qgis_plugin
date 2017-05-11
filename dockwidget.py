@@ -6,12 +6,13 @@ import os
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
 
-import lizard_connector
+from .utils.constants import AREA_FILTERS
 from .utils.constants import STYLES_ROOT
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'dockwidget.ui'))
 
+AREA_FILTER_CURRENT_VIEW = "Current view"
 TAB_PRIVATE_DATA = "Private data"
 TAB_PUBLIC_DATA = "Public data"
 
@@ -63,6 +64,12 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 asset_type = "{}{}".format(asset_type, UNSTYLED_POSTFIX)
             self.data_type_combobox_private.addItem(asset_type)
             self.data_type_combobox_public.addItem(asset_type)
+
+    def add_areafilters_to_combobox(self):
+        """Add the area filters to the combobox."""
+        for area_filter in AREA_FILTERS:
+            self.area_combobox_private.addItem(area_filter)
+            self.area_combobox_public.addItem(area_filter)
 
     def reset_datatypes_combobox(self):
         """Function to reset the data."""

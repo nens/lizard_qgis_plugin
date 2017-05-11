@@ -4,6 +4,7 @@ QGIS plug-in for viewing data from Lizard in QGIS.
 ## Features
 * Log in with Lizard account
 * View all the assets of a certain asset type (all private data upon login, or all public data)
+* Filter data on current bbox (also known as extent)
 * Log out
 
 ## Requirements

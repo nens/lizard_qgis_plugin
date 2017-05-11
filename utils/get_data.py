@@ -7,6 +7,7 @@ import urllib
 
 from .constants import BASE_URL
 from .constants import ERROR_LEVEL_CRITICAL
+from .constants import ERROR_LEVEL_INFO
 from .user_communication import show_message
 
 DOWNLOAD_LIMIT = 1000
@@ -19,7 +20,7 @@ TASK_INTERVAL_INCREMENT = 0.25
 TASK_INTERVAL_MAX = 5
 
 
-def get_data(username, password, asset_type):
+def get_data(username, password, asset_type, payload):
     """
     Function to get the JSON with asset data from the Lizard API.
 
@@ -27,9 +28,11 @@ def get_data(username, password, asset_type):
     password is the password used for logging into Lizard.
     """
     # Download all the assets of an asset type
-    max_amount = get_max_amount(username, password, asset_type)
-    payload = {"async": "true", "format": PAYLOAD_FORMAT,
-               "page_size": DOWNLOAD_LIMIT, "page": 1}
+    max_amount = get_max_amount(username, password, asset_type, payload)
+    payload["async"] = "true"
+    payload["format"] = PAYLOAD_FORMAT
+    payload["page_size"] = DOWNLOAD_LIMIT
+    payload["page"] = 1
     current_amount = 0
     results = []
     queue_time_interval = TASK_INTERVAL_MIN
@@ -59,8 +62,11 @@ def get_data(username, password, asset_type):
             # Get the JSON with the data
             result_url = task_json["result_url"]
             result_json = send_request(result_url, username, password)
-            for result in result_json["results"]:
-                results.append(result)
+            try:
+                for result in result_json["results"]:
+                    results.append(result)
+            except KeyError:
+                return
         elif task_status == TASK_STATUS_FAILURE:
             show_message(ERROR_LEVEL_CRITICAL, "Task failure.")
 
@@ -69,10 +75,10 @@ def get_data(username, password, asset_type):
         payload["page"] += 1
 
     # Return the results
-    return results
+    return max_amount, results
 
 
-def get_max_amount(username, password, asset_type):
+def get_max_amount(username, password, asset_type, payload):
     """
     Function to get the max amount of assets of an asset type.
 
@@ -82,7 +88,8 @@ def get_max_amount(username, password, asset_type):
     username is the username used for logging into Lizard.
     password is the password used for logging into Lizard.
     """
-    payload = {"format": PAYLOAD_FORMAT, "page_size": 1}
+    payload["format"] = PAYLOAD_FORMAT
+    payload["page_size"] = 1
     url = BASE_URL + asset_type
     max_amount_json = get_json(username, password, url, payload)
     max_amount = max_amount_json["count"]
