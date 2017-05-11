@@ -22,6 +22,7 @@ from .log_in_dialog import LogInDialog
 from .utils.constants import AREA_FILTERS
 from .utils.constants import ASSET_TYPES
 from .utils.constants import ERROR_LEVEL_INFO
+from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import PRIVATE
 from .utils.constants import PUBLIC
@@ -207,9 +208,6 @@ class LizardViewer:
                 self.dockwidget.add_datatypes_to_combobox(ASSET_TYPES)
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_areafilters_to_combobox()
-                # Set the status bar text
-                self.dockwidget.set_all_status_bars_text(
-                    "Lizard Viewer started.")
                 # Go to the select data tab
                 self.dockwidget.change_tab(TAB_PRIVATE_DATA)
                 # Connect the login button of the private data tab with
@@ -248,9 +246,6 @@ class LizardViewer:
             data_type_combobox = self.dockwidget.data_type_combobox_public
         asset_type_index = data_type_combobox.currentIndex()
         asset_type = ASSET_TYPES[asset_type_index]
-        # Set the status bar text
-        self.dockwidget.set_all_status_bars_text(
-            "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
         # Get the selected public or private area
         payload = {}
@@ -265,15 +260,11 @@ class LizardViewer:
         if list_of_assets:
             # Create a new vector layer
             self.layer = create_layer(asset_type, list_of_assets)
-            # Set the status bar text
-            self.dockwidget.set_all_status_bars_text(
-                "{} {} downloaded.".format(max_amount, asset_type))
+            # Show how many and which asset type is downloaded.
             show_message(ERROR_LEVEL_SUCCESS, "{} {} downloaded.".format(
                 max_amount, asset_type))
         else:
             # Show that there are no assets
-            self.dockwidget.set_all_status_bars_text(
-                "No {} found.".format(asset_type))
             show_message(ERROR_LEVEL_INFO, "No {} found".format(asset_type))
 
     def show_login_dialog(self):
@@ -306,8 +297,6 @@ class LizardViewer:
             # the API
             for user in users:
                 if user["username"] == self.username:
-                    # Show logged in in the status bar
-                    self.dockwidget.set_all_status_bars_text("Logged in.")
                     # Go to the Private data tab
                     self.dockwidget.change_tab(TAB_PRIVATE_DATA)
                     # Clear the user info
@@ -316,13 +305,15 @@ class LizardViewer:
                     self.login_dialog.close()
                     # Set the login button text to log out
                     self.dockwidget.login_button_private.setText("Log out")
+                    # Show a logged in message
+                    show_message(ERROR_LEVEL_INFO, "Logged in.")
         except urllib2.HTTPError:
             # Reset the user credentials
             self.username = None
             self.password = None
-            # Show log in error in the status bar
-            self.dockwidget.set_all_status_bars_text(
-                "User/password combination incorrect.")
+            # Show log in error in the message bar
+            show_message(ERROR_LEVEL_WARNING,
+                         "User/password combination incorrect.")
 
     def log_out(self):
         """Function to log out the user."""
@@ -333,7 +324,7 @@ class LizardViewer:
         self.dockwidget.reset_datatypes_combobox()
         # Set the text of the login button to log in
         self.dockwidget.login_button_private.setText("Log in")
-        # Show a log out message in the status bars
-        self.dockwidget.set_all_status_bars_text("Logged out.")
         # Go to the public data tab
         self.dockwidget.change_tab(TAB_PUBLIC_DATA)
+        # Show a logged out message
+        show_message(ERROR_LEVEL_INFO, "Logged out.")

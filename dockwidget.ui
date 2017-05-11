@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>313</width>
-    <height>359</height>
+    <height>321</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,11 +20,11 @@
       <x>0</x>
       <y>0</y>
       <width>311</width>
-      <height>331</height>
+      <height>291</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="usesScrollButtons">
      <bool>false</bool>
@@ -69,25 +69,6 @@
       </property>
       <property name="flat">
        <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QLabel" name="status_bar_private">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>270</y>
-        <width>301</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="cursor">
-       <cursorShape>ArrowCursor</cursorShape>
-      </property>
-      <property name="text">
-       <string>Status bar</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
       </property>
      </widget>
      <widget class="QLabel" name="data_type_label_private">
@@ -254,22 +235,6 @@
       </property>
       <property name="text">
        <string>Area</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="status_bar_public">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>270</y>
-        <width>301</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Status bar</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </widget>
