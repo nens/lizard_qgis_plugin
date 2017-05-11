@@ -263,6 +263,11 @@ class LizardViewer:
             # Show how many and which asset type is downloaded.
             show_message(ERROR_LEVEL_SUCCESS, "{} {} downloaded.".format(
                 max_amount, asset_type))
+        elif self.iface.activeLayer() is None:
+            # Show message that there is no active layer to get the extent of
+            show_message(
+                ERROR_LEVEL_WARNING, "No {} found. Please add a \
+                layer in order to get the 'Current view'.".format(asset_type))
         else:
             # Show that there are no assets
             show_message(ERROR_LEVEL_INFO, "No {} found".format(asset_type))
