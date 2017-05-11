@@ -6,6 +6,8 @@ import urllib2
 import urllib
 
 from .constants import BASE_URL
+from .constants import ERROR_LEVEL_CRITICAL
+from .user_communication import show_message
 
 DOWNLOAD_LIMIT = 1000
 PAYLOAD_FORMAT = "json"
@@ -17,7 +19,7 @@ TASK_INTERVAL_INCREMENT = 0.25
 TASK_INTERVAL_MAX = 5
 
 
-def get_data(dockwidget, username, password, asset_type):
+def get_data(username, password, asset_type):
     """
     Function to get the JSON with asset data from the Lizard API.
 
@@ -60,7 +62,7 @@ def get_data(dockwidget, username, password, asset_type):
             for result in result_json["results"]:
                 results.append(result)
         elif task_status == TASK_STATUS_FAILURE:
-            dockwidget.set_all_status_bars_text("Task failure.")
+            show_message(ERROR_LEVEL_CRITICAL, "Task failure.")
 
         # Get the results from the JSON
         current_amount += DOWNLOAD_LIMIT

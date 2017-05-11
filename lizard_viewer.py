@@ -19,8 +19,10 @@ from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
+from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.get_data import get_data
 from .utils.layer import create_layer
+from .utils.user_communication import show_message
 
 
 class LizardViewer:
@@ -242,13 +244,14 @@ class LizardViewer:
         self.dockwidget.set_all_status_bars_text(
             "Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
-        list_of_assets = get_data(self.dockwidget, self.username,
-                                  self.password, asset_type)
+        list_of_assets = get_data(self.username, self.password, asset_type)
         # Create a new vector layer
-        create_layer(asset_type, list_of_assets, self.dockwidget)
+        create_layer(asset_type, list_of_assets)
         # Set the status bar text
         self.dockwidget.set_all_status_bars_text(
             "{} downloaded.".format(asset_type.capitalize()))
+        show_message(ERROR_LEVEL_SUCCESS, "{} downloaded.".format(
+            asset_type.capitalize()))
 
     def show_login_dialog(self):
         """Function to show the login dialog."""

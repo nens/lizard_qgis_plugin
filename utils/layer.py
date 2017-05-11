@@ -8,29 +8,26 @@ from qgis.core import QgsVectorLayer
 
 from .constants import ASSET_GEOMETRY_TYPES
 from .constants import WGS84
+from .constants import ERROR_LEVEL_WARNING
 from .geometry import create_geometry
 from .styler import apply_style
+from .user_communication import show_message
 
 
-def create_layer(asset_type, list_of_assets, dockwidget):
+def create_layer(asset_type, list_of_assets):
     """Function to create a new (memory) layer."""
     # Create the layer
     geometry_type = ASSET_GEOMETRY_TYPES[asset_type]
     layer = QgsVectorLayer("{}?crs={}".format(geometry_type, WGS84),
                            asset_type, "memory")
-
     # Add Lizard style (SVG/ QML)
     apply_style(layer, asset_type)
-
     # Add the layer
     QgsMapLayerRegistry.instance().addMapLayer(layer)
-
     # Add the attributes to the layer
     add_attributes(layer, list_of_assets)
-
     # Add the features to the layer
-    add_features(layer, list_of_assets, dockwidget)
-
+    add_features(layer, list_of_assets)
     # Return the layer
     return layer
 
@@ -52,7 +49,7 @@ def add_attributes(layer, assets):
     layer.updateFields()
 
 
-def add_features(layer, list_of_assets, dockwidget):
+def add_features(layer, list_of_assets):
     """Function to add features to the layer."""
     # Create the feature(s)
     layer.startEditing()
@@ -64,8 +61,8 @@ def add_features(layer, list_of_assets, dockwidget):
             qgs_geometry = create_geometry(geometry)
             feature.setGeometry(qgs_geometry)
         except TypeError:
-            dockwidget.set_all_status_bars_text(
-                "Id {} has no geometry.".format(asset['id']))
+            show_message(ERROR_LEVEL_WARNING,
+                         "Id {} has no geometry.".format(asset['id']))
         set_attributes(feature, asset)
         features.append(feature)
 

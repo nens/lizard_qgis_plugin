@@ -22,6 +22,11 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
 # The base_url used for getting the data (JSON)
 BASE_URL = "https://demo.lizard.net/api/v2/"
 
+ERROR_LEVEL_CRITICAL = "Critical"
+ERROR_LEVEL_WARNING = "Warning"
+ERROR_LEVEL_INFO = "Info"
+ERROR_LEVEL_SUCCESS = "Success"
+
 # Add reference to layer_styles directory
 STYLES_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                            os.path.pardir, 'layer_styles')
