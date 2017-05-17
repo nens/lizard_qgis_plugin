@@ -40,9 +40,6 @@ class Worker(QThread):
 
     def start_(self, asset_type_index):
         """Thin wrapper around the ``start()`` method which starts the thread.
-
-        Args:
-            idx: the asset type index
         """
         self.asset_type_index = asset_type_index
         self.start()
