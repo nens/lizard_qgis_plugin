@@ -31,25 +31,30 @@ class Worker(QThread):
     output = pyqtSignal(object)
 
     def __init__(self, parent=None):
-        self.idx = None
+        self.asset_type_index = None
         super(Worker, self).__init__(parent)
 
     def __del__(self):
         self.exiting = True
         self.wait()
 
-    def start_(self, idx):
-        self.idx = idx
+    def start_(self, asset_type_index):
+        """Thin wrapper around the ``start()`` method which starts the thread.
+
+        Args:
+            idx: the asset type index
+        """
+        self.asset_type_index = asset_type_index
         self.start()
 
     def run(self):
-        """Called indirectly by PyQt"""
+        """Called indirectly by PyQt if you call ``start``."""
         data = self.show_data()
-        self.output.emit((self.idx, data))
+        self.output.emit((self.asset_type_index, data))
 
     def show_data(self):
         """Show the data as a new layer on the map."""
-        asset_type = ASSET_TYPES[self.idx]
+        asset_type = ASSET_TYPES[self.asset_type_index]
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
         return get_data(asset_type, payload)
