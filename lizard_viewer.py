@@ -50,11 +50,11 @@ class Worker(QThread):
         This method retrieves the data from Lizard and emits it via the
         ``output`` signal together with the asset type index as tuple.
         """
-        data = self.show_data()
+        data = self._get_data()
         self.output.emit((self.asset_type_index, data))
 
-    def show_data(self):
-        """Show the data as a new layer on the map."""
+    def _get_data(self):
+        """Get the data."""
         asset_type = ASSET_TYPES[self.asset_type_index]
         # Get a list with JSONs containing the data from the Lizard API
         payload = {"page_size": 100}
