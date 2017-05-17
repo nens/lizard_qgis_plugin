@@ -12,7 +12,7 @@ from .geometry import create_geometry
 from .styler import apply_style
 
 
-def create_layer(asset_type, list_of_assets):
+def create_layer(asset_type, list_of_assets, add=True):
     """Function to create a new (memory) layer."""
     # Create the layer
     geometry_type = ASSET_GEOMETRY_TYPES[asset_type]
@@ -23,7 +23,8 @@ def create_layer(asset_type, list_of_assets):
     apply_style(layer, asset_type)
 
     # Add the layer
-    QgsMapLayerRegistry.instance().addMapLayer(layer)
+    if add:
+        QgsMapLayerRegistry.instance().addMapLayer(layer)
 
     # Add the attributes to the layer
     add_attributes(layer, list_of_assets)

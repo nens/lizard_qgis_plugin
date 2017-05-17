@@ -8,6 +8,7 @@ from PyQt4.QtCore import QSettings
 from PyQt4.QtCore import Qt
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
+from PyQt4.QtCore import QThread, pyqtSignal
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 
@@ -21,6 +22,37 @@ from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
 from .utils.get_data import get_data
 from .utils.layer import create_layer
+
+from qgis.core import QgsVectorLayer
+from qgis.core import QgsMapLayerRegistry
+
+
+class Worker(QThread):
+    output = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        self.idx = None
+        super(Worker, self).__init__(parent)
+
+    def __del__(self):
+        self.exiting = True
+        self.wait()
+
+    def start_(self, idx):
+        self.idx = idx
+        self.start()
+
+    def run(self):
+        """Called indirectly by PyQt"""
+        data = self.show_data()
+        self.output.emit((self.idx, data))
+
+    def show_data(self):
+        """Show the data as a new layer on the map."""
+        asset_type = ASSET_TYPES[self.idx]
+        # Get a list with JSONs containing the data from the Lizard API
+        payload = {"page_size": 100}
+        return get_data(asset_type, payload)
 
 
 class LizardViewer:
@@ -61,6 +93,7 @@ class LizardViewer:
 
         self.pluginIsActive = False
         self.dockwidget = None
+        self.thread = Worker()
     # noinspection PyMethodMayBeStatic
 
     def tr(self, message):
@@ -208,8 +241,11 @@ class LizardViewer:
                 # Connect the View data buttons with the show data functions
                 self.dockwidget.view_data_button_private.clicked.connect(
                     self.show_private_data)
+
                 self.dockwidget.view_data_button_public.clicked.connect(
-                    self.show_public_data)
+                    self.show_public_data_threaded)
+                self.thread.output.connect(self.display_layer)
+
                 # Connect the log_in function to the Log in button of the
                 # Log in dialog
                 self.login_dialog.log_in_button.clicked.connect(self.log_in)
@@ -220,6 +256,17 @@ class LizardViewer:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
+    def display_layer(self, idx_and_list_of_assets_tuple):
+        idx, list_of_assets = idx_and_list_of_assets_tuple
+        print "DISPLAY LAYER"
+        asset_type = ASSET_TYPES[idx]
+        self.layer = create_layer(asset_type, list_of_assets)
+        # Set the status bar text
+        self.dockwidget.set_all_status_bars_text(
+            "{} downloaded.".format(asset_type.capitalize()))
+        #self.thread.quit()
+        #self.thread.wait()
+
     def show_private_data(self):
         """Show private data."""
         self.show_data("private")
@@ -227,6 +274,12 @@ class LizardViewer:
     def show_public_data(self):
         """Show public data."""
         self.show_data("public")
+
+    def show_public_data_threaded(self):
+        """Show public data."""
+        data_type_combobox = self.dockwidget.data_type_combobox_public
+        asset_type_index = data_type_combobox.currentIndex()
+        self.thread.start_(asset_type_index)
 
     def show_data(self, public_or_private):
         """Show the data as a new layer on the map."""
