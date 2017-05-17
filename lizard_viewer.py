@@ -28,7 +28,7 @@ from qgis.core import QgsMapLayerRegistry
 
 
 class Worker(QThread):
-    output = pyqtSignal(object)
+    output = pyqtSignal(object)  # tuple: (asset_type_index, JSON data)
 
     def __init__(self, parent=None):
         self.asset_type_index = None
@@ -45,7 +45,11 @@ class Worker(QThread):
         self.start()
 
     def run(self):
-        """Called indirectly by PyQt if you call ``start()``."""
+        """Called indirectly by PyQt if you call ``start()``.
+
+        This method retrieves the data from Lizard and emits it via the
+        ``output`` signal together with the asset type index as tuple.
+        """
         data = self.show_data()
         self.output.emit((self.asset_type_index, data))
 
