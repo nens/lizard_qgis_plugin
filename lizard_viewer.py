@@ -45,7 +45,7 @@ class Worker(QThread):
         self.start()
 
     def run(self):
-        """Called indirectly by PyQt if you call ``start``."""
+        """Called indirectly by PyQt if you call ``start()``."""
         data = self.show_data()
         self.output.emit((self.asset_type_index, data))
 
@@ -245,7 +245,7 @@ class LizardViewer:
                     self.show_private_data)
 
                 self.dockwidget.view_data_button_public.clicked.connect(
-                    self.show_public_data_threaded)
+                    self.show_public_data_async)
                 self.thread.output.connect(self.display_layer)
 
                 # Connect the log_in function to the Log in button of the
@@ -277,8 +277,8 @@ class LizardViewer:
         """Show public data."""
         self.show_data("public")
 
-    def show_public_data_threaded(self):
-        """Show public data."""
+    def show_public_data_async(self):
+        """Show public data asynchronously."""
         data_type_combobox = self.dockwidget.data_type_combobox_public
         asset_type_index = data_type_combobox.currentIndex()
         self.thread.start_(asset_type_index)
