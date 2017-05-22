@@ -23,10 +23,16 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
 # The base_url used for getting the data (JSON)
 BASE_URL = "https://demo.lizard.net/api/v2/"
 
+ERROR_LEVEL_CRITICAL = "Critical"
+ERROR_LEVEL_WARNING = "Warning"
+ERROR_LEVEL_INFO = "Info"
+ERROR_LEVEL_SUCCESS = "Success"
+
 PAYLOAD_BBOX_KEY_TIMESERIES = "geom__within"
 PAYLOAD_BBOX_KEY_OTHER = "in_bbox"
 PRIVATE = "private"
 PUBLIC = "public"
+
 
 # Add reference to layer_styles directory
 STYLES_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),

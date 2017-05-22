@@ -8,8 +8,10 @@ from qgis.core import QgsVectorLayer
 
 from .constants import ASSET_GEOMETRY_TYPES
 from .constants import WGS84
+from .constants import ERROR_LEVEL_WARNING
 from .geometry import create_geometry
 from .styler import apply_style
+from .user_communication import show_message
 
 
 def create_layer(asset_type, list_of_assets):
@@ -18,19 +20,14 @@ def create_layer(asset_type, list_of_assets):
     geometry_type = ASSET_GEOMETRY_TYPES[asset_type]
     layer = QgsVectorLayer("{}?crs={}".format(geometry_type, WGS84),
                            asset_type, "memory")
-
     # Add Lizard style (SVG/ QML)
     apply_style(layer, asset_type)
-
     # Add the layer
     QgsMapLayerRegistry.instance().addMapLayer(layer)
-
     # Add the attributes to the layer
     add_attributes(layer, list_of_assets)
-
     # Add the features to the layer
     add_features(layer, list_of_assets)
-
     # Return the layer
     return layer
 
@@ -59,9 +56,13 @@ def add_features(layer, list_of_assets):
     features = []
     for asset in list_of_assets:
         feature = QgsFeature(layer.pendingFields())
-        geometry = asset["geometry"]
-        qgs_geometry = create_geometry(geometry)
-        feature.setGeometry(qgs_geometry)
+        try:
+            geometry = asset["geometry"]
+            qgs_geometry = create_geometry(geometry)
+            feature.setGeometry(qgs_geometry)
+        except TypeError:
+            show_message("Id {} has no geometry.".format(asset['id']),
+                         ERROR_LEVEL_WARNING)
         set_attributes(feature, asset)
         features.append(feature)
 
