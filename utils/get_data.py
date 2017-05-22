@@ -67,12 +67,16 @@ def get_data(username, password, asset_type, payload):
                     results.append(result)
             except KeyError:
                 return
+            # Get the results from the JSON
+            current_amount += DOWNLOAD_LIMIT
+            payload["page"] += 1
         elif task_status == TASK_STATUS_FAILURE:
             show_message("Task failure.", ERROR_LEVEL_CRITICAL)
-
-        # Get the results from the JSON
-        current_amount += DOWNLOAD_LIMIT
-        payload["page"] += 1
+            return
+        else:
+            show_message("Uncaught task status: {}.".format(task_status),
+                         ERROR_LEVEL_CRITICAL)
+            return
 
     # Return the results
     return max_amount, results
