@@ -7,7 +7,6 @@ import urllib
 
 from .constants import BASE_URL
 from .constants import ERROR_LEVEL_CRITICAL
-from .constants import ERROR_LEVEL_INFO
 from .user_communication import show_message
 
 DOWNLOAD_LIMIT = 1000
@@ -40,12 +39,13 @@ def get_data(username, password, asset_type, payload):
     while current_amount < max_amount:
         # Create a task to download the JSON async
         task_start_url = "{}{}/".format(BASE_URL, asset_type)
-        task_start_json = get_json(username, password, task_start_url, payload)
+        task_start_json = send_request(
+            task_start_url, username, password, payload)
 
         # Get the task JSON
         task_payload = {"format": "json"}
         task_url = "{}".format(task_start_json["url"])
-        task_json = get_json(username, password, task_url, task_payload)
+        task_json = send_request(task_url, username, password, task_payload)
 
         # Check whether the task is done
         task_status = str(task_json["task_status"])
@@ -68,7 +68,7 @@ def get_data(username, password, asset_type, payload):
             except KeyError:
                 return
         elif task_status == TASK_STATUS_FAILURE:
-            show_message(ERROR_LEVEL_CRITICAL, "Task failure.")
+            show_message("Task failure.", ERROR_LEVEL_CRITICAL)
 
         # Get the results from the JSON
         current_amount += DOWNLOAD_LIMIT
@@ -91,31 +91,31 @@ def get_max_amount(username, password, asset_type, payload):
     payload["format"] = PAYLOAD_FORMAT
     payload["page_size"] = 1
     url = BASE_URL + asset_type
-    max_amount_json = get_json(username, password, url, payload)
+    max_amount_json = send_request(
+        url, username, password, payload)
     max_amount = max_amount_json["count"]
     return max_amount
 
 
-def get_json(username, password, base_url, payload):
-    """
-    Function to get a JSON from the Lizard API.
-
-    username is the username used for logging into Lizard.
-    password is the password used for logging into Lizard.
-    """
-    payload_encoded = urllib.urlencode(payload)
-    url = "{}?{}".format(base_url, payload_encoded)
-    json_ = send_request(url, username, password)
-    return json_
-
-
-def send_request(url, username, password):
+def send_request(url, username, password, payload=None):
     """
     Send a request to the Lizard API.
 
-    username is the username used for logging into Lizard.
-    password is the password used for logging into Lizard.
+    Args:
+        (str) url: The url to request. If a payload is added as argument,
+                        it will be encoded and added to the url.
+        (str) username: The username used for logging into Lizard.
+        (str) password: The password used for logging into Lizard.
+        (dict) payload: Optional. Payload to add to the request.
+
+    Returns:
+        (json) json_: JSON with the results of the request.
     """
+    # Encode the payload and add to the base_url.
+    if payload is not None:
+        payload_encoded = urllib.urlencode(payload)
+        url = "{}?{}".format(url, payload_encoded)
+    # Send the request
     request = urllib2.Request(url)
     request = use_header(request, username, password)
     response = urllib2.urlopen(request)

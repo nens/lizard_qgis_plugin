@@ -9,7 +9,7 @@ from .constants import ERROR_LEVEL_INFO
 from .constants import ERROR_LEVEL_SUCCESS
 
 
-def show_message(error_level, message):
+def show_message(message, error_level=ERROR_LEVEL_INFO):
     """
     Function to show a message in a QGIS messagebar.
 

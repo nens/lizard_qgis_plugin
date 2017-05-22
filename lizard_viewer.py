@@ -11,17 +11,15 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
-
-import lizard_connector
 # Initialize Qt resources from file resources.py
 import resources
+
+import lizard_connector
 from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
-from .utils.constants import AREA_FILTERS
 from .utils.constants import ASSET_TYPES
-from .utils.constants import ERROR_LEVEL_INFO
 from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import PRIVATE
@@ -261,16 +259,16 @@ class LizardViewer:
             # Create a new vector layer
             self.layer = create_layer(asset_type, list_of_assets)
             # Show how many and which asset type is downloaded.
-            show_message(ERROR_LEVEL_SUCCESS, "{} {} downloaded.".format(
-                max_amount, asset_type))
+            show_message("{} {} downloaded.".format(
+                max_amount, asset_type), ERROR_LEVEL_SUCCESS)
         elif self.iface.activeLayer() is None:
             # Show message that there is no active layer to get the extent of
             show_message(
-                ERROR_LEVEL_WARNING, "No {} found. Please add a \
-                layer in order to get the 'Current view'.".format(asset_type))
+                "No {} found. Please add a layer in order to get the \
+                'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
         else:
             # Show that there are no assets
-            show_message(ERROR_LEVEL_INFO, "No {} found".format(asset_type))
+            show_message("No {} found".format(asset_type))
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
@@ -311,14 +309,14 @@ class LizardViewer:
                     # Set the login button text to log out
                     self.dockwidget.login_button_private.setText("Log out")
                     # Show a logged in message
-                    show_message(ERROR_LEVEL_INFO, "Logged in.")
+                    show_message("Logged in.")
         except urllib2.HTTPError:
             # Reset the user credentials
             self.username = None
             self.password = None
             # Show log in error in the message bar
-            show_message(ERROR_LEVEL_WARNING,
-                         "User/password combination incorrect.")
+            show_message("User/password combination incorrect.",
+                         ERROR_LEVEL_WARNING)
 
     def log_out(self):
         """Function to log out the user."""
@@ -332,4 +330,4 @@ class LizardViewer:
         # Go to the public data tab
         self.dockwidget.change_tab(TAB_PUBLIC_DATA)
         # Show a logged out message
-        show_message(ERROR_LEVEL_INFO, "Logged out.")
+        show_message("Logged out.")

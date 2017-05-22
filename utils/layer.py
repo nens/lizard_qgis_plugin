@@ -61,8 +61,8 @@ def add_features(layer, list_of_assets):
             qgs_geometry = create_geometry(geometry)
             feature.setGeometry(qgs_geometry)
         except TypeError:
-            show_message(ERROR_LEVEL_WARNING,
-                         "Id {} has no geometry.".format(asset['id']))
+            show_message("Id {} has no geometry.".format(asset['id']),
+                         ERROR_LEVEL_WARNING)
         set_attributes(feature, asset)
         features.append(feature)
 
