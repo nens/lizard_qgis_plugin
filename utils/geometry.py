@@ -56,8 +56,9 @@ def create_geometry(geometry):
     return QgsGeometry.fromMultiPolygon(list_of_polygons)
 
 
-def add_area_filter(iface, payload, asset_type, area_type):
+def add_area_filter(iface, asset_type, area_type):
     """Function to add an area filter to the payload."""
+    payload = {}
     if area_type == AREA_FILTER_CURRENT_VIEW:
         if asset_type == "timeseries":
             payload_bbox_key = PAYLOAD_BBOX_KEY_TIMESERIES

@@ -3,10 +3,11 @@
 import os.path
 import urllib2
 
-# from qgis.utils import iface
+from PyQt4.QtCore import pyqtSignal
 from PyQt4.QtCore import QCoreApplication
 from PyQt4.QtCore import QSettings
 from PyQt4.QtCore import Qt
+from PyQt4.QtCore import QThread
 from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
@@ -20,14 +21,70 @@ from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
-from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import ERROR_LEVEL_SUCCESS
+from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import PRIVATE
 from .utils.constants import PUBLIC
 from .utils.get_data import get_data
 from .utils.geometry import add_area_filter
 from .utils.layer import create_layer
 from .utils.user_communication import show_message
+
+
+class Worker(QThread):
+    """This class creates a worker thread for getting the data."""
+
+    output = pyqtSignal(object)
+
+    def __init__(self, parent=None):
+        """Initiate the Worker."""
+        super(Worker, self).__init__(parent)
+
+    def start_(self, asset_type, payload, username, password):
+        """
+        Thin wrapper around the start() method which starts the thread.
+
+        Args:
+            (str) asset_type: Get data from the Lizard API from this
+                              asset type.
+            (dict) payload: A dictionary containing a possible payload add to
+                            the API call.
+            (str) username: The username of the Lizard account.
+            (str) password: The password of the Lizard account.
+        """
+        self.asset_type = asset_type
+        self.payload = payload
+        self.username = username
+        self.password = password
+        self.start()
+
+    def run(self):
+        """Called indirectly by PyQt if you call start().
+
+        This method retrieves the data from Lizard and emits it via the
+        output signal as dictionary.
+        """
+        data = self._get_data()
+        self.output.emit((data))
+
+    def _get_data(self):
+        """
+        Get the data from the Lizard API.
+
+        Returns:
+            (dict) data: A data dictionary containing the
+                         asset type (data['asset_type']),
+                         max_amount of results (data['max_amount']),
+                         list of assets (data['list_of_assets'])
+        """
+        max_amount, list_of_assets = get_data(
+            self.username, self.password, self.asset_type, self.payload)
+        data = {
+            "asset_type": self.asset_type,
+            "max_amount": max_amount,
+            "list_of_assets": list_of_assets
+        }
+        return data
 
 
 class LizardViewer:
@@ -68,6 +125,7 @@ class LizardViewer:
 
         self.pluginIsActive = False
         self.dockwidget = None
+        self.thread = Worker()
     # noinspection PyMethodMayBeStatic
 
     def tr(self, message):
@@ -214,9 +272,12 @@ class LizardViewer:
                     self.show_login_dialog)
                 # Connect the View data buttons with the show data functions
                 self.dockwidget.view_data_button_private.clicked.connect(
-                    self.show_private_data)
+                    self.show_private_data_async)
                 self.dockwidget.view_data_button_public.clicked.connect(
-                    self.show_public_data)
+                    self.show_public_data_async)
+                # Connect the output of the worker thread to the display_layer
+                # function
+                self.thread.output.connect(self.display_layer)
                 # Connect the log_in function to the Log in button of the
                 # Log in dialog
                 self.login_dialog.log_in_button.clicked.connect(self.log_in)
@@ -227,16 +288,16 @@ class LizardViewer:
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.dockwidget)
             self.dockwidget.show()
 
-    def show_private_data(self):
-        """Show private data."""
-        self.show_data(PRIVATE)
+    def show_private_data_async(self):
+        """Show private data asynchronously."""
+        self.show_data_async(PRIVATE)
 
-    def show_public_data(self):
-        """Show public data."""
-        self.show_data(PUBLIC)
+    def show_public_data_async(self):
+        """Show public data asynchronously."""
+        self.show_data_async(PUBLIC)
 
-    def show_data(self, public_or_private):
-        """Show the data as a new layer on the map."""
+    def show_data_async(self, public_or_private):
+        """Show data asynchronically."""
         # Get the selected public or private asset_type
         if public_or_private == PRIVATE:
             data_type_combobox = self.dockwidget.data_type_combobox_private
@@ -246,15 +307,18 @@ class LizardViewer:
         asset_type = ASSET_TYPES[asset_type_index]
         # Get a list with JSONs containing the data from the Lizard API
         # Get the selected public or private area
-        payload = {}
         if public_or_private == PRIVATE:
             area_type = self.dockwidget.area_combobox_private.currentText()
         else:
             area_type = self.dockwidget.area_combobox_public.currentText()
-        payload = add_area_filter(self.iface, payload, asset_type, area_type)
-        max_amount, list_of_assets = get_data(self.username, self.password,
-                                              asset_type, payload)
-        # Create a new layer with the asset data
+        payload = add_area_filter(self.iface, asset_type, area_type)
+        self.thread.start_(asset_type, payload, self.username, self.password)
+
+    def display_layer(self, data):
+        """Display the data of the Worker as a layer."""
+        asset_type = data["asset_type"]
+        max_amount = data["max_amount"]
+        list_of_assets = data["list_of_assets"]
         if list_of_assets:
             # Create a new vector layer
             self.layer = create_layer(asset_type, list_of_assets)
