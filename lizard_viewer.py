@@ -333,7 +333,6 @@ class LizardViewer:
         else:
             # Show that there are no assets
             show_message("No {} found".format(asset_type))
-        self.thread.output.connect(self.thread.quit)
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
