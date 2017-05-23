@@ -21,8 +21,8 @@ from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
-from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import ERROR_LEVEL_SUCCESS
+from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import PRIVATE
 from .utils.constants import PUBLIC
 from .utils.get_data import get_data
@@ -40,14 +40,9 @@ class Worker(QThread):
         """Initiate the Worker."""
         super(Worker, self).__init__(parent)
 
-    def __del__(self):
-        """Delete the worker."""
-        self.exiting = True
-        self.wait()
-
     def start_(self, asset_type, payload, username, password):
         """
-        Thin wrapper around the ``start()`` method which starts the thread.
+        Thin wrapper around the start() method which starts the thread.
 
         Args:
             (str) asset_type: Get data from the Lizard API from this
@@ -64,10 +59,10 @@ class Worker(QThread):
         self.start()
 
     def run(self):
-        """Called indirectly by PyQt if you call ``start()``.
+        """Called indirectly by PyQt if you call start().
 
         This method retrieves the data from Lizard and emits it via the
-        ``output`` signal as dictionary.
+        output signal as dictionary.
         """
         data = self._get_data()
         self.output.emit((data))
@@ -84,10 +79,11 @@ class Worker(QThread):
         """
         max_amount, list_of_assets = get_data(
             self.username, self.password, self.asset_type, self.payload)
-        data = {}
-        data["asset_type"] = self.asset_type
-        data["max_amount"] = max_amount
-        data["list_of_assets"] = list_of_assets
+        data = {
+            "asset_type": self.asset_type,
+            "max_amount": max_amount,
+            "list_of_assets": list_of_assets
+        }
         return data
 
 
@@ -337,8 +333,7 @@ class LizardViewer:
         else:
             # Show that there are no assets
             show_message("No {} found".format(asset_type))
-        #self.thread.quit()
-        #self.thread.wait()
+        self.thread.output.connect(self.thread.quit)
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
