@@ -16,6 +16,7 @@ from PyQt4.QtGui import QIcon
 import resources
 
 import lizard_connector
+from .dockwidget import AREA_FILTER_CURRENT_VIEW
 from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
@@ -302,19 +303,22 @@ class LizardViewer:
             data_type_combobox = self.dockwidget.data_type_combobox_public
         asset_type_index = data_type_combobox.currentIndex()
         asset_type = ASSET_TYPES[asset_type_index]
-        # Check wheter a layer is active
-        if self.iface.activeLayer() is None:
-            # Show message that there is no active layer to get the extent of
-            show_message(
-                "No {} found. Please add a layer in order to get the \
-                'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
-            return
         # Get a list with JSONs containing the data from the Lizard API
         # Get the selected public or private area
         if public_or_private == PRIVATE:
             area_type = self.dockwidget.area_combobox_private.currentText()
         else:
             area_type = self.dockwidget.area_combobox_public.currentText()
+        # Check wheter a layer is active
+        if(self.iface.activeLayer() is None and
+           area_type == AREA_FILTER_CURRENT_VIEW):
+            # Show message that there is no active layer with an extent
+            show_message(
+                "No {} found. Please add a layer in order to get the \
+                'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
+            return
+        # Show message that connection to Lizard API will be made
+        show_message("Connecting to Lizard API...")
         payload = add_area_filter(self.iface, asset_type, area_type)
         self.thread.start_(asset_type, payload, self.username, self.password)
 
