@@ -75,10 +75,20 @@ def set_attributes(feature, asset):
     """
     Function to set the attributes of a QGIS feature.
 
+    Nested assets (filters, timeseries and pumps) are taken into account.
+    They are shown with ";" in between.
+
     Arguments:
         feature (QgsFeature): A QGIS feature to add attributes to.
         asset (JSON): A JSON, containing data about the asset.
     """
+    # Create a list of values per feature
     for attribute, value in asset.iteritems():
         if attribute != "geometry":
+            if attribute == "filters":
+                value = ";".join(str(filters["id"]) for filters in value)
+            elif attribute == "pumps":
+                value = ";".join(str(pumps["id"]) for pumps in value)
+            elif attribute == "timeseries":
+                value = ";".join(timeseries["uuid"] for timeseries in value)
             feature.setAttribute(attribute, value)
