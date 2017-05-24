@@ -19,12 +19,24 @@ TASK_INTERVAL_INCREMENT = 0.25
 TASK_INTERVAL_MAX = 5
 
 
-def get_data(username, password, asset_type, payload):
+def retrieve_data_from_lizard(username, password, asset_type, payload):
     """
     Function to get the JSON with asset data from the Lizard API.
 
-    username is the username used for logging into Lizard.
-    password is the password used for logging into Lizard.
+    Args:
+        (str) asset_type: Get data from the Lizard API from this
+                          asset type.
+        (dict) payload: A dictionary containing a possible payload add to
+                        the API call.
+        (str) username: The username of the Lizard account.
+        (str) password: The password of the Lizard account.
+
+    Returns:
+        (dict) data: A data dictionary containing the
+                     asset type (data['asset_type']),
+                     max_amount of results (data['max_amount']),
+                     list of assets (data['list_of_assets']),
+                     error_message (data['error_message'])
     """
     # Download all the assets of an asset type
     max_amount = get_max_amount(username, password, asset_type, payload)
@@ -35,8 +47,16 @@ def get_data(username, password, asset_type, payload):
     current_amount = 0
     results = []
     queue_time_interval = TASK_INTERVAL_MIN
+    error_message = ""
+    data = {
+        "asset_type": asset_type,
+        "max_amount": max_amount,
+        "list_of_assets": results,
+        "error_message": error_message
+    }
 
     while current_amount < max_amount:
+        # show_message("Downloading {}...".format(asset_type))
         # Create a task to download the JSON async
         task_start_url = "{}{}/".format(BASE_URL, asset_type)
         task_start_json = send_request(
@@ -71,15 +91,16 @@ def get_data(username, password, asset_type, payload):
             current_amount += DOWNLOAD_LIMIT
             payload["page"] += 1
         elif task_status == TASK_STATUS_FAILURE:
-            show_message("Task failure.", ERROR_LEVEL_CRITICAL)
-            return
+            data["error_message"] = "Task failure."
+            return data
         else:
-            show_message("Uncaught task status: {}.".format(task_status),
-                         ERROR_LEVEL_CRITICAL)
-            return
+            data["error_message"] = "Uncaught task status: {}.".format(
+                task_status)
+            return data
 
-    # Return the results
-    return max_amount, results
+    # Return the data
+    data["list_of_assets"] = results
+    return data
 
 
 def get_max_amount(username, password, asset_type, payload):
