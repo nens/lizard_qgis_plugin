@@ -305,6 +305,7 @@ class LizardViewer:
             data_type_combobox = self.dockwidget.data_type_combobox_public
         asset_type_index = data_type_combobox.currentIndex()
         asset_type = ASSET_TYPES[asset_type_index]
+        show_message("Downloading {}...".format(asset_type))
         # Get a list with JSONs containing the data from the Lizard API
         # Get the selected public or private area
         if public_or_private == PRIVATE:
