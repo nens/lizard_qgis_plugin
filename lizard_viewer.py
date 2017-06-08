@@ -16,16 +16,18 @@ from PyQt4.QtGui import QIcon
 import resources
 
 import lizard_connector
+from .dockwidget import AREA_FILTER_CURRENT_VIEW
 from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
+from .utils.constants import ERROR_LEVEL_CRITICAL
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import ERROR_LEVEL_WARNING
 from .utils.constants import PRIVATE
 from .utils.constants import PUBLIC
-from .utils.get_data import get_data
+from .utils.get_data import retrieve_data_from_lizard
 from .utils.geometry import add_area_filter
 from .utils.layer import create_layer
 from .utils.user_communication import show_message
@@ -75,15 +77,11 @@ class Worker(QThread):
             (dict) data: A data dictionary containing the
                          asset type (data['asset_type']),
                          max_amount of results (data['max_amount']),
-                         list of assets (data['list_of_assets'])
+                         list of assets (data['list_of_assets']),
+                         error_message (data['error_message'])
         """
-        max_amount, list_of_assets = get_data(
+        data = retrieve_data_from_lizard(
             self.username, self.password, self.asset_type, self.payload)
-        data = {
-            "asset_type": self.asset_type,
-            "max_amount": max_amount,
-            "list_of_assets": list_of_assets
-        }
         return data
 
 
@@ -311,11 +309,33 @@ class LizardViewer:
             area_type = self.dockwidget.area_combobox_private.currentText()
         else:
             area_type = self.dockwidget.area_combobox_public.currentText()
+        # Check wheter a layer is active
+        if(self.iface.activeLayer() is None and
+           area_type == AREA_FILTER_CURRENT_VIEW):
+            # Show message that there is no active layer with an extent
+            show_message(
+                "No {} found. Please add a layer in order to get the \
+                'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
+            return
+        # Show message that connection to Lizard API will be made
+        show_message("Downloading from Lizard API...")
         payload = add_area_filter(self.iface, asset_type, area_type)
         self.thread.start_(asset_type, payload, self.username, self.password)
 
     def display_layer(self, data):
-        """Display the data of the Worker as a layer."""
+        """
+        Display the data of the Worker as a layer.
+
+        Args:
+            (dict) data: A data dictionary containing the
+                         asset type (data['asset_type']),
+                         max_amount of results (data['max_amount']),
+                         list of assets (data['list_of_assets']),
+                         error_message (data['error_message'])
+        """
+        if data["error_message"] != "":
+            show_message(data["error_message"], ERROR_LEVEL_CRITICAL)
+            return
         asset_type = data["asset_type"]
         max_amount = data["max_amount"]
         list_of_assets = data["list_of_assets"]
@@ -325,11 +345,6 @@ class LizardViewer:
             # Show how many and which asset type is downloaded.
             show_message("{} {} downloaded.".format(
                 max_amount, asset_type), ERROR_LEVEL_SUCCESS)
-        elif self.iface.activeLayer() is None:
-            # Show message that there is no active layer to get the extent of
-            show_message(
-                "No {} found. Please add a layer in order to get the \
-                'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
         else:
             # Show that there are no assets
             show_message("No {} found".format(asset_type))
