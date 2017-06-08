@@ -318,7 +318,7 @@ class LizardViewer:
                 'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
             return
         # Show message that connection to Lizard API will be made
-        show_message("Connecting to Lizard API...")
+        show_message("Downloading from Lizard API...")
         payload = add_area_filter(self.iface, asset_type, area_type)
         self.thread.start_(asset_type, payload, self.username, self.password)
 
