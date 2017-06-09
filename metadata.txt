@@ -10,7 +10,7 @@
 name=Lizard Viewer
 qgisMinimumVersion=2.0
 description=This plug-in helps with downloading data from Lizard in QGIS.
-version=0.4
+version=0.5
 author=Madeleine van Winkel
 email=madeleine.vanwinkel@nelen-schuurmans.nl
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4 (unreleased)
+0.5 (2017-06-09)
 
 ### Features
 - Show nested assets: filters, pumps and timeseries
