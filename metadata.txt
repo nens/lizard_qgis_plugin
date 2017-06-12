@@ -14,19 +14,19 @@ version=0.6
 author=Madeleine van Winkel
 email=madeleine.vanwinkel@nelen-schuurmans.nl
 
-about=The purpose of this plug-in is to be able to download data from Lizard into QGIS. Requirements: QGIS version 2.0
+about=The purpose of this plug-in is to be able to download data from the Lizard API into QGIS. Lizard is a framework for showing water-related information. It is a cloud solution, meaning that you can use it everywhere. As a user, you'll get an account which you can use immediately. Updates of the software and the data are done automatically in the background. You will have the latest data within your grasp. With this plugin, you can download data from the Lizard API (a REST API). You can either download private data with your Lizard account or public data (for which no log in is required). There are currently multiple data types you can download: bridges, culverts, fixed drainage level areas, groundwater stations, levee cross sections, manholes, measuring stations, monitoring wells, outlets, overflows, pipes, pressure pipes, pumpstations, sluices, waste water treatment plants, weirs. You can also choose a spatial filtering: 'Current view' (current extent) or 'All data'. For more information about Lizard: https://www.lizard.net/ For more information about the Lizard API: https://demo.lizard.net/doc/ Requirements: QGIS version 2.0
 
-tracker=https://github.com/nens/LizardViewer
+tracker=https://github.com/nens/LizardViewer/issues
 repository=https://github.com/nens/LizardViewer
 # End of mandatory metadata
 
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=https://github.com/nens/LizardViewer
+changelog=https://github.com/nens/LizardViewer/blob/master/CHANGELOG.md
 
 # Tags are comma separated with spaces allowed
-tags=lizard, qgis, q-gis, plugin, plug-in, download, downloader, upload, uploader
+tags=lizard, download, downloader, bridges, culverts, fixed drainage level areas, groundwater stations, levee cross sections, manholes, measuring stations, monitoring wells, outlets, overflows, pipes, pressure pipes, pumpstations, sluices, waste water treatment plants, weirs
 
 homepage=https://github.com/nens/LizardViewer
 category=Plugins
