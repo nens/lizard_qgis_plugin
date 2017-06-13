@@ -3,19 +3,7 @@
 0.6 (unreleased)
 ----------------
 
-- Nothing changed yet.
-
-
-0.5 (2017-06-09)
-----------------
-
-- Nothing changed yet.
-
-
-0.5 (2017-06-09)
-----------------
-
-- Nothing changed yet.
+- Update metadata: more elaborate description.
 
 
 0.5 (2017-06-09)
