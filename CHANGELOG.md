@@ -1,7 +1,13 @@
 # Changelog
 
-0.6 (unreleased)
+
+0.7 (unreleased)
 ----------------
+
+- Update lizard-connector
+
+0.6
+---
 
 - Update metadata: more elaborate description.
 
