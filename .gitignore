@@ -15,7 +15,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -93,3 +92,4 @@ ENV/
 
 # help/build/ folder
 help/build/
+
