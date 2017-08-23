@@ -4,7 +4,7 @@
 0.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added lizard-connector as subfolder in libs instead of gitmodule to prevent errors using the plugin in QGIS.
 
 
 0.7 (2017-08-10)
