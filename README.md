@@ -9,7 +9,6 @@ QGIS plug-in for viewing data from Lizard in QGIS.
 
 ## Requirements
 * QGIS 2.14
-* [lizard-connector](https://github.com/lizardsystem/lizard-connector) (included)
 
 ## Installation
 The plug-in can be added using one of the following ways:

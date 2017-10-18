@@ -4,7 +4,7 @@
 0.8 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Remove the lizard-connector from the plugin. This is done to prevent errors caused by using the LizardViewer as well as the ThreeDiToolbox, which both use the lizard-connector. 
 
 
 0.7 (2017-08-10)

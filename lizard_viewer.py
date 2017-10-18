@@ -15,7 +15,6 @@ from PyQt4.QtGui import QIcon
 # Initialize Qt resources from file resources.py
 import resources
 
-import lizard_connector
 from .dockwidget import AREA_FILTER_CURRENT_VIEW
 from .dockwidget import LizardViewerDockWidget
 from .dockwidget import TAB_PRIVATE_DATA
@@ -370,14 +369,13 @@ class LizardViewer:
         # Check if the user exists
         try:
             # Get the possible users of the API the user has access to
-            users_endpoint = lizard_connector.connector.Endpoint(
-                username=self.username,
-                password=self.password,
-                endpoint="users")
-            users = users_endpoint.download()
+            asset_type = "users"
+            payload = {}
+            users = retrieve_data_from_lizard(
+                self.username, self.password, asset_type, payload)
             # Check whether the username and password match with those of
             # the API
-            for user in users:
+            for user in users["list_of_assets"]:
                 if user["username"] == self.username:
                     # Go to the Private data tab
                     self.dockwidget.change_tab(TAB_PRIVATE_DATA)
