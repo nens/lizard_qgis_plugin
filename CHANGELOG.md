@@ -1,7 +1,7 @@
 # Changelog
 
 
-0.8 (unreleased)
+0.8 (2017-10-19)
 ----------------
 
 - Remove the lizard-connector from the plugin. This is done to prevent errors caused by using the LizardViewer as well as the ThreeDiToolbox, which both use the lizard-connector. 
