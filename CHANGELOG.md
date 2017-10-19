@@ -1,8 +1,8 @@
 # Changelog
 
 
-0.9 (unreleased)
-----------------
+0.10 (2017-10-19)
+-----------------
 
 - Nothing changed yet.
 
