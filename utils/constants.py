@@ -19,6 +19,28 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
                         "outlets": "Point", "overflows": "Point",
                         "pumpstations": "Point", "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
+RASTER_TYPES = [
+    'dem:nl',
+    'extern:nl:flevoland',
+    'cover:fun',
+]
+
+RASTER_INFO = {
+    'dem:nl': {
+        'uuid': '1d65a4e1-ac2f-4e66-9e52-1d130d870a34',
+        'temporal': False
+    },
+    'extern:nl:flevoland': {
+        'uuid': '920937b3-478c-4cac-bbd1-350ca6d52eff',
+        'temporal': True,
+    },
+    'cover:fun': {
+        'uuid': 'b92c5c3a-854e-47b8-a083-ae9bf1760496',
+        'temporal': False,
+    }
+}
+
+DATA_TYPES = ASSET_TYPES + RASTER_TYPES
 
 # The base_url used for getting the data (JSON)
 BASE_URL = "https://demo.lizard.net/api/v2/"
@@ -30,9 +52,6 @@ ERROR_LEVEL_SUCCESS = "Success"
 
 PAYLOAD_BBOX_KEY_TIMESERIES = "geom__within"
 PAYLOAD_BBOX_KEY_OTHER = "in_bbox"
-PRIVATE = "private"
-PUBLIC = "public"
-
 
 # Add reference to layer_styles directory
 STYLES_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),
