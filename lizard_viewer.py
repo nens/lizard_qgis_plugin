@@ -310,42 +310,41 @@ class LizardViewer:
 
     def show_private_data_async(self):
         """Show private data asynchronously."""
-        data_type_combobox = self.dockwidget.data_type_combobox_private
         area_type = self.dockwidget.area_combobox_private.currentText()
-        type_index = data_type_combobox.currentIndex()
+        type_index = self.dockwidget.data_type_combobox_private.currentIndex()
         data_type = DATA_TYPES[type_index]
         self.show_data_async(data_type, area_type)
 
     def show_public_data_async(self):
         """Show public data asynchronously."""
-        data_type_combobox = self.dockwidget.data_type_combobox_public
         area_type = self.dockwidget.area_combobox_public.currentText()
-        type_index = data_type_combobox.currentIndex()
+        type_index = self.dockwidget.data_type_combobox_public.currentIndex()
         data_type = DATA_TYPES[type_index]
         self.show_data_async(data_type, area_type)
 
     def show_data_async(self, data_type, area_type):
         """Show data asynchronically."""
-        # Check wheter a layer is active
+        # Check whether a layer is active
         if(self.iface.activeLayer() is None and
            area_type == AREA_FILTER_CURRENT_VIEW):
             # Show message that there is no active layer with an extent
             show_message(
-                "No {} found. Please add a layer in order to get the \
-                'Current view'.".format(data_type), ERROR_LEVEL_WARNING)
+                "Please add a base layer in order to get the \
+                'Current view'.", ERROR_LEVEL_WARNING)
             return
-        # Show message that connection to Lizard API will be made
+        # Check required extent for rasters
+        if data_type in RASTER_TYPES and area_type != AREA_FILTER_CURRENT_VIEW:
+            show_message(
+                "Rasters only work with current view for now.",
+                ERROR_LEVEL_WARNING)
+            return
+
         show_message("Downloading from Lizard API...")
         if data_type in ASSET_TYPES:
             payload = add_area_filter(self.iface, data_type, area_type)
             self.asset_worker.start_(
                 data_type, payload, self.username, self.password)
         elif data_type in RASTER_TYPES:
-            if area_type != AREA_FILTER_CURRENT_VIEW:
-                show_message(
-                    "Rasters only work with current view currently.",
-                    ERROR_LEVEL_WARNING)
-                return
             bbox = get_bbox(self.iface)
             self.raster_worker.start_(
                 data_type, bbox, self.username, self.password)
