@@ -13,7 +13,7 @@ from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
 # Initialize Qt resources from file resources.py
-import resources
+import resources  # noqa
 
 from .dockwidget import AREA_FILTER_CURRENT_VIEW
 from .dockwidget import LizardViewerDockWidget
@@ -21,25 +21,29 @@ from .dockwidget import TAB_PRIVATE_DATA
 from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
+from .utils.constants import DATA_TYPES
+from .utils.constants import RASTER_TYPES
 from .utils.constants import ERROR_LEVEL_CRITICAL
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import ERROR_LEVEL_WARNING
-from .utils.constants import PRIVATE
-from .utils.constants import PUBLIC
 from .utils.get_data import retrieve_data_from_lizard
 from .utils.geometry import add_area_filter
+from .utils.geometry import get_bbox
 from .utils.layer import create_layer
 from .utils.user_communication import show_message
+from .utils.rasters import fetch_layer_from_server
+from .utils.rasters import BoundingBox
+from .utils.rasters import calc_request_width_height
 
 
-class Worker(QThread):
+class AssetWorker(QThread):
     """This class creates a worker thread for getting the data."""
 
     output = pyqtSignal(object)
 
     def __init__(self, parent=None):
-        """Initiate the Worker."""
-        super(Worker, self).__init__(parent)
+        """Initiate the AssetWorker."""
+        super(AssetWorker, self).__init__(parent)
 
     def start_(self, asset_type, payload, username, password):
         """
@@ -66,7 +70,7 @@ class Worker(QThread):
         output signal as dictionary.
         """
         data = self._get_data()
-        self.output.emit((data))
+        self.output.emit(data)
 
     def _get_data(self):
         """
@@ -82,6 +86,23 @@ class Worker(QThread):
         data = retrieve_data_from_lizard(
             self.username, self.password, self.asset_type, self.payload)
         return data
+
+
+class RasterWorker(AssetWorker):
+    def start_(self, layer, bbox, username, password):
+        self.layer = layer
+        self._bbox = bbox
+        self.bbox = BoundingBox(self._bbox)
+        self.width, self.height = calc_request_width_height(self.bbox)
+        self.username = username
+        self.password = password
+        self.start()
+
+    def _get_data(self):
+        path = fetch_layer_from_server(
+            self.bbox, self.width, self.height, layer=self.layer,
+            username=self.username, password=self.password)
+        return {'layer': self.layer, 'path': path}
 
 
 class LizardViewer:
@@ -122,7 +143,8 @@ class LizardViewer:
 
         self.pluginIsActive = False
         self.dockwidget = None
-        self.thread = Worker()
+        self.asset_worker = AssetWorker()
+        self.raster_worker = RasterWorker()
     # noinspection PyMethodMayBeStatic
 
     def tr(self, message):
@@ -258,7 +280,7 @@ class LizardViewer:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = LizardViewerDockWidget()
                 # Add the asset types to the data type comboboxes
-                self.dockwidget.add_datatypes_to_combobox(ASSET_TYPES)
+                self.dockwidget.add_datatypes_to_combobox(DATA_TYPES)
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_areafilters_to_combobox()
                 # Go to the select data tab
@@ -274,7 +296,8 @@ class LizardViewer:
                     self.show_public_data_async)
                 # Connect the output of the worker thread to the display_layer
                 # function
-                self.thread.output.connect(self.display_layer)
+                self.asset_worker.output.connect(self.display_asset_layer)
+                self.raster_worker.output.connect(self.display_raster_layer)
                 # Connect the log_in function to the Log in button of the
                 # Log in dialog
                 self.login_dialog.log_in_button.clicked.connect(self.log_in)
@@ -287,43 +310,48 @@ class LizardViewer:
 
     def show_private_data_async(self):
         """Show private data asynchronously."""
-        self.show_data_async(PRIVATE)
+        area_type = self.dockwidget.area_combobox_private.currentText()
+        type_index = self.dockwidget.data_type_combobox_private.currentIndex()
+        data_type = DATA_TYPES[type_index]
+        self.show_data_async(data_type, area_type)
 
     def show_public_data_async(self):
         """Show public data asynchronously."""
-        self.show_data_async(PUBLIC)
+        area_type = self.dockwidget.area_combobox_public.currentText()
+        type_index = self.dockwidget.data_type_combobox_public.currentIndex()
+        data_type = DATA_TYPES[type_index]
+        self.show_data_async(data_type, area_type)
 
-    def show_data_async(self, public_or_private):
+    def show_data_async(self, data_type, area_type):
         """Show data asynchronically."""
-        # Get the selected public or private asset_type
-        if public_or_private == PRIVATE:
-            data_type_combobox = self.dockwidget.data_type_combobox_private
-        else:
-            data_type_combobox = self.dockwidget.data_type_combobox_public
-        asset_type_index = data_type_combobox.currentIndex()
-        asset_type = ASSET_TYPES[asset_type_index]
-        # Get a list with JSONs containing the data from the Lizard API
-        # Get the selected public or private area
-        if public_or_private == PRIVATE:
-            area_type = self.dockwidget.area_combobox_private.currentText()
-        else:
-            area_type = self.dockwidget.area_combobox_public.currentText()
-        # Check wheter a layer is active
+        # Check whether a layer is active
         if(self.iface.activeLayer() is None and
            area_type == AREA_FILTER_CURRENT_VIEW):
             # Show message that there is no active layer with an extent
             show_message(
-                "No {} found. Please add a layer in order to get the \
-                'Current view'.".format(asset_type), ERROR_LEVEL_WARNING)
+                "Please add a base layer in order to get the \
+                'Current view'.", ERROR_LEVEL_WARNING)
             return
-        # Show message that connection to Lizard API will be made
-        show_message("Downloading from Lizard API...")
-        payload = add_area_filter(self.iface, asset_type, area_type)
-        self.thread.start_(asset_type, payload, self.username, self.password)
+        # Check required extent for rasters
+        if data_type in RASTER_TYPES and area_type != AREA_FILTER_CURRENT_VIEW:
+            show_message(
+                "Rasters only work with current view for now.",
+                ERROR_LEVEL_WARNING)
+            return
 
-    def display_layer(self, data):
+        show_message("Downloading from Lizard API...")
+        if data_type in ASSET_TYPES:
+            payload = add_area_filter(self.iface, data_type, area_type)
+            self.asset_worker.start_(
+                data_type, payload, self.username, self.password)
+        elif data_type in RASTER_TYPES:
+            bbox = get_bbox(self.iface)
+            self.raster_worker.start_(
+                data_type, bbox, self.username, self.password)
+
+    def display_asset_layer(self, data):
         """
-        Display the data of the Worker as a layer.
+        Display asset data as a layer.
 
         Args:
             (dict) data: A data dictionary containing the
@@ -347,6 +375,15 @@ class LizardViewer:
         else:
             # Show that there are no assets
             show_message("No {} found".format(asset_type))
+
+    def display_raster_layer(self, data):
+        if data['path']:
+            self.iface.addRasterLayer(data['path'], data['layer'])
+            show_message(
+                "Downloaded %s" % data['layer'], ERROR_LEVEL_SUCCESS)
+        else:
+            show_message(
+                "Failed to download %s" % data['layer'], ERROR_LEVEL_CRITICAL)
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
