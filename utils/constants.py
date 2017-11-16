@@ -20,21 +20,21 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
                         "pumpstations": "Point", "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
 RASTER_TYPES = [
-    'dem:nl',
-    'extern:nl:flevoland',
-    'cover:fun',
+    'DEM Netherlands',
+    'Land use old',
+    'NDVI Flevoland'
 ]
 
 RASTER_INFO = {
-    'dem:nl': {
+    'DEM Netherlands': {
         'uuid': '1d65a4e1-ac2f-4e66-9e52-1d130d870a34',
         'temporal': False
     },
-    'extern:nl:flevoland': {
+    'NDVI Flevoland': {
         'uuid': '920937b3-478c-4cac-bbd1-350ca6d52eff',
         'temporal': True,
     },
-    'cover:fun': {
+    'Land use old': {
         'uuid': 'b92c5c3a-854e-47b8-a083-ae9bf1760496',
         'temporal': False,
     }

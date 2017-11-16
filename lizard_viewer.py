@@ -26,6 +26,7 @@ from .utils.constants import RASTER_TYPES
 from .utils.constants import ERROR_LEVEL_CRITICAL
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import ERROR_LEVEL_WARNING
+from .utils.constants import STYLES_ROOT
 from .utils.get_data import retrieve_data_from_lizard
 from .utils.geometry import add_area_filter
 from .utils.geometry import get_bbox
@@ -384,6 +385,11 @@ class LizardViewer:
         else:
             show_message(
                 "Failed to download %s" % data['layer'], ERROR_LEVEL_CRITICAL)
+        qml_path = os.path.join(STYLES_ROOT, "{}.qml".format(data['layer']))
+        if os.path.exists(qml_path):
+            self.iface.activeLayer().loadNamedStyle(qml_path)
+            self.iface.legendInterface().refreshLayerSymbology(
+                self.iface.activeLayer())
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
