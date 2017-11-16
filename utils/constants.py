@@ -20,13 +20,13 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
                         "pumpstations": "Point", "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
 RASTER_TYPES = [
-    'DEM (Netherlands)',
+    'DEM Netherlands',
     'Land use (old)',
     'NDVI (Flevoland)'
 ]
 
 RASTER_INFO = {
-    'DEM (Netherlands)': {
+    'DEM Netherlands': {
         'uuid': '1d65a4e1-ac2f-4e66-9e52-1d130d870a34',
         'temporal': False
     },

@@ -68,7 +68,7 @@ class BoundingBox(object):
 
 def fetch_layer_from_server(
         bbox, width, height, dt=None, srs='epsg:4326',
-        layer='DEM (Netherlands)', username=None, password=None,
+        layer='DEM Netherlands', username=None, password=None,
         server='https://demo.lizard.net/api/v3/rasters/'):
     """
     Fetches rain data from raster server.
