@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module containing the main file for the QGIS Lizard plug-in."""
 import os.path
+import time
 import urllib2
 
 from PyQt4.QtCore import pyqtSignal
@@ -90,18 +91,29 @@ class AssetWorker(QThread):
 
 
 class RasterWorker(AssetWorker):
-    def start_(self, layer, bbox, username, password):
+    def start_(self, layer, bbox, from_date, to_epoch, time_interval,
+               username, password):
+        # def start_(self, layer, bbox, from_epoch, to_epoch, time_interval,
+        #            username, password):
         self.layer = layer
         self._bbox = bbox
         self.bbox = BoundingBox(self._bbox)
         self.width, self.height = calc_request_width_height(self.bbox)
+        self.from_date = from_date
+        self.to_epoch = to_epoch
+        self.time_interval = time_interval
         self.username = username
         self.password = password
         self.start()
 
     def _get_data(self):
         path = fetch_layer_from_server(
-            self.bbox, self.width, self.height, layer=self.layer,
+            self.bbox, self.width, self.height,
+            # dt=None,
+            from_date=self.from_date,
+            to_epoch=self.to_epoch,
+            time_interval=self.time_interval,
+            layer=self.layer,
             username=self.username, password=self.password)
         return {'layer': self.layer, 'path': path}
 
@@ -347,8 +359,24 @@ class LizardViewer:
                 data_type, payload, self.username, self.password)
         elif data_type in RASTER_TYPES:
             bbox = get_bbox(self.iface)
+            from_date = self.dockwidget.from_date_dateTimeEdit.dateTime()\
+                .toString("yyyy-MM-dd HH:mm:00")  # 2000-01-01 00:00
+            pattern = "%Y-%m-%d %H:%M:%S"
+            # from_epoch = int(time.mktime(time.strptime(
+            #     from_date, pattern)) * 1000)
+            # print from_epoch
+            to_date = self.dockwidget.to_date_dateTimeEdit.dateTime()\
+                .toString("yyyy-MM-dd HH:mm:00")  # 2000-01-01 00:00
+            to_epoch = int(time.mktime(time.strptime(to_date, pattern)))
+            time_interval = self.dockwidget.time_interval_combobox\
+                .currentText()
+            print to_epoch
             self.raster_worker.start_(
-                data_type, bbox, self.username, self.password)
+                data_type, bbox,
+                from_date,
+                to_epoch,
+                time_interval,
+                self.username, self.password)
 
     def display_asset_layer(self, data):
         """
@@ -380,16 +408,17 @@ class LizardViewer:
     def display_raster_layer(self, data):
         if data['path']:
             self.iface.addRasterLayer(data['path'], data['layer'])
+            qml_path = os.path.join(STYLES_ROOT,
+                                    "{}.qml".format(data['layer']))
+            if os.path.exists(qml_path):
+                self.iface.activeLayer().loadNamedStyle(qml_path)
+                self.iface.legendInterface().refreshLayerSymbology(
+                    self.iface.activeLayer())
             show_message(
                 "Downloaded %s" % data['layer'], ERROR_LEVEL_SUCCESS)
         else:
             show_message(
                 "Failed to download %s" % data['layer'], ERROR_LEVEL_CRITICAL)
-        qml_path = os.path.join(STYLES_ROOT, "{}.qml".format(data['layer']))
-        if os.path.exists(qml_path):
-            self.iface.activeLayer().loadNamedStyle(qml_path)
-            self.iface.legendInterface().refreshLayerSymbology(
-                self.iface.activeLayer())
 
     def show_login_dialog(self):
         """Function to show the login dialog."""
