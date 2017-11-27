@@ -12,7 +12,7 @@ import urlparse
 
 from .constants import RASTER_INFO
 from .get_data import use_header
-from .get_data import retrieve_raster_uuid_from_lizard
+# from .get_data import retrieve_raster_uuid_from_lizard
 
 # 1 pixel is 1 km x 1 km, so we should be good for now; if rain resolution
 # increases, we might want to redefine this desired array size
@@ -69,8 +69,8 @@ class BoundingBox(object):
 
 def fetch_layer_from_server(
         bbox, width, height, dt=None,
-        from_date=None,
-        to_epoch=None,
+        from_datetime=None,
+        to_datetime=None,
         time_interval=None,
         srs='epsg:4326', layer='DEM Netherlands',
         username=None, password=None,
@@ -121,39 +121,22 @@ def fetch_layer_from_server(
             'start': '',
             'stop': '',
         })
-    # layer_uuid = retrieve_raster_uuid_from_lizard(
-    #     username, password, RASTER_INFO[layer]['raster_name'])
-    print from_date
+    # loop from_epoch (from_date)
+    # print window
+    # if RASTER_INFO[layer]['raster_name'] == 'Regen':
+    #     parameters.update({
+    #         'time': '',
+    #         'start': '',
+    #         'stop': '',
+    #         'window': '3600000'
+    #     })
     if RASTER_INFO[layer]['raster_name'] == 'Regen':
         parameters.update({
-            'start': '',  # moet string zijn
-            'time': from_date,
-            'stop': ''
-        })
-    # print from_epoch
-    # if RASTER_INFO[layer]['raster_name'] == 'Regen':
-    #     parameters.update({
-    #         'start': str(from_epoch),  # moet string zijn
-    #         'time': time_interval,
-    #         'stop': str(to_epoch)
-    #     })
-
-    # print parameters['start']
-    # # print from_epoch
-    # if RASTER_INFO[layer]['raster_name'] == 'Regen':
-    #     parameters.update({
-    #         'time': '5min',
-    #         'start': '1262300400000',
-    #         'stop': '1262300400000',
-    #     })
-    # # if RASTER_INFO[layer]['raster_name'] == 'Regen':
-    # #     parameters.update({
-    # #         'start': '1262300400000',  # from_epoch,
-    # #         'time': '5min',  # time_interval,
-    # #         'stop': '',
-    # #     })
-    # #     layer_uuid = "730d6675-35dd-4a35-aa9b-bfb8155f9ca7"
-    # # print layer_uuid
+            'time': from_datetime,
+            # 'start': '2017-12-06T08:20:14',
+            # 'stop': '2017-12-13T10:25:57',
+            # 'window': '3600000'
+        })  # https://demo.lizard.net/api/v3/raster-aggregates/?agg=average&geom=POLYGON+((-12.3046875+57.136239319177434,+23.9501953125+57.136239319177434,+23.9501953125+50.47149085139956,+-12.3046875+50.47149085139956,+-12.3046875+57.136239319177434))&rasters=730d667&srs=EPSG:4326&start=2017-12-06T08:20:14&stop=2017-12-13T10:25:57&window=86400000
     layer_uuid = RASTER_INFO[layer]["uuid"]
 
     url = '{path}?{pars}'.format(

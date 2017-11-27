@@ -234,6 +234,9 @@
        <property name="displayFormat">
         <string>dd-MM-yyyy HH:mm</string>
        </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
+       </property>
       </widget>
       <widget class="QDateTimeEdit" name="to_date_dateTimeEdit">
        <property name="geometry">
@@ -270,6 +273,9 @@
        </property>
        <property name="displayFormat">
         <string>dd-MM-yyyy HH:mm</string>
+       </property>
+       <property name="calendarPopup">
+        <bool>true</bool>
        </property>
       </widget>
      </widget>

@@ -91,16 +91,15 @@ class AssetWorker(QThread):
 
 
 class RasterWorker(AssetWorker):
-    def start_(self, layer, bbox, from_date, to_epoch, time_interval,
+    def start_(self, layer, bbox,
+               from_datetime, to_datetime, time_interval,
                username, password):
-        # def start_(self, layer, bbox, from_epoch, to_epoch, time_interval,
-        #            username, password):
         self.layer = layer
         self._bbox = bbox
         self.bbox = BoundingBox(self._bbox)
         self.width, self.height = calc_request_width_height(self.bbox)
-        self.from_date = from_date
-        self.to_epoch = to_epoch
+        self.from_datetime = from_datetime
+        self.to_datetime = to_datetime
         self.time_interval = time_interval
         self.username = username
         self.password = password
@@ -109,9 +108,8 @@ class RasterWorker(AssetWorker):
     def _get_data(self):
         path = fetch_layer_from_server(
             self.bbox, self.width, self.height,
-            # dt=None,
-            from_date=self.from_date,
-            to_epoch=self.to_epoch,
+            from_datetime=self.from_datetime,
+            to_datetime=self.to_datetime,
             time_interval=self.time_interval,
             layer=self.layer,
             username=self.username, password=self.password)
@@ -359,24 +357,60 @@ class LizardViewer:
                 data_type, payload, self.username, self.password)
         elif data_type in RASTER_TYPES:
             bbox = get_bbox(self.iface)
-            from_date = self.dockwidget.from_date_dateTimeEdit.dateTime()\
-                .toString("yyyy-MM-dd HH:mm:00")  # 2000-01-01 00:00
+            # Start datetime
+            from_datetime = self.dockwidget.from_date_dateTimeEdit.dateTime()\
+                .toString("yyyy-MM-dd HH:mm:00")
+            print from_datetime  # 2000-01-01 00:00
             pattern = "%Y-%m-%d %H:%M:%S"
-            # from_epoch = int(time.mktime(time.strptime(
-            #     from_date, pattern)) * 1000)
-            # print from_epoch
-            to_date = self.dockwidget.to_date_dateTimeEdit.dateTime()\
+            from_epoch = int(time.mktime(time.strptime(
+                from_datetime, pattern)))
+            print from_epoch  # 1325286000
+            from_datetime2 = time.strftime(pattern, time.localtime(from_epoch))
+            print from_datetime2  # 2000-01-01 00:00
+            # Stop datetime
+            to_datetime = self.dockwidget.to_date_dateTimeEdit.dateTime()\
                 .toString("yyyy-MM-dd HH:mm:00")  # 2000-01-01 00:00
-            to_epoch = int(time.mktime(time.strptime(to_date, pattern)))
-            time_interval = self.dockwidget.time_interval_combobox\
-                .currentText()
+            # ook mogelijk als yyyy-MM-ddTHH:mm:00Z
+            # (volgens docs raster store)?
+            to_epoch = int(time.mktime(time.strptime(to_datetime, pattern)))
             print to_epoch
-            self.raster_worker.start_(
-                data_type, bbox,
-                from_date,
-                to_epoch,
-                time_interval,
-                self.username, self.password)
+            time_interval = str(self.dockwidget.time_interval_combobox
+                                .currentText())
+            if data_type == 'Rain':
+                window = 0
+                if time_interval == "5min":
+                    window = 30000
+                elif time_interval == "hour":
+                    window = 360000
+                elif time_interval == "day":
+                    window = 864000
+                else:
+                    window = 864000
+                current_epoch = from_epoch
+                while current_epoch < to_epoch:
+                    print current_epoch
+                    from_datetime = time.strftime(
+                        '%Y-%m-%d %H:%M:%S', time.localtime(current_epoch))
+                    self.raster_worker = RasterWorker()
+                    self.raster_worker.start_(
+                        data_type, bbox,
+                        from_datetime,  # current_epoch
+                        to_datetime,
+                        time_interval,
+                        self.username, self.password)
+                    current_epoch += window
+                    self.raster_worker.output.connect(
+                        self.display_raster_layer)  # creates the same raster
+                    print current_epoch, to_epoch
+            # if self.from_date and self.to_date:
+            # elif self.from_date:
+            else:
+                self.raster_worker.start_(
+                    data_type, bbox,
+                    from_datetime,
+                    to_datetime,
+                    time_interval,
+                    self.username, self.password)
 
     def display_asset_layer(self, data):
         """
