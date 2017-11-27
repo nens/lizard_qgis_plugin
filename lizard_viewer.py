@@ -113,7 +113,11 @@ class RasterWorker(AssetWorker):
             time_interval=self.time_interval,
             layer=self.layer,
             username=self.username, password=self.password)
-        return {'layer': self.layer, 'path': path}
+        layer_name = self.layer
+        if self.layer == 'Rain':
+            layer_name = '{} {}'.format(self.layer, self.from_datetime)
+        return {'layer': self.layer, 'path': path,
+                'layer_name': layer_name}
 
 
 class LizardViewer:
@@ -291,7 +295,7 @@ class LizardViewer:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = LizardViewerDockWidget()
                 # Add the asset types to the data type comboboxes
-                self.dockwidget.add_datatypes_to_combobox(DATA_TYPES)
+                self.dockwidget.add_datatypes_to_combobox()
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_areafilters_to_combobox()
                 # Go to the select data tab
@@ -441,7 +445,7 @@ class LizardViewer:
 
     def display_raster_layer(self, data):
         if data['path']:
-            self.iface.addRasterLayer(data['path'], data['layer'])
+            self.iface.addRasterLayer(data['path'], data['layer_name'])
             qml_path = os.path.join(STYLES_ROOT,
                                     "{}.qml".format(data['layer']))
             if os.path.exists(qml_path):
