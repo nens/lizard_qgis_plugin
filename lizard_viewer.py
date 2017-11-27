@@ -379,13 +379,13 @@ class LizardViewer:
             if data_type == 'Rain':
                 window = 0
                 if time_interval == "5min":
-                    window = 30000
+                    window = 300
                 elif time_interval == "hour":
-                    window = 360000
+                    window = 3600
                 elif time_interval == "day":
-                    window = 864000
+                    window = 86400
                 else:
-                    window = 864000
+                    window = 86400
                 current_epoch = from_epoch
                 while current_epoch < to_epoch:
                     print current_epoch
