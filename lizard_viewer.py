@@ -115,7 +115,8 @@ class RasterWorker(AssetWorker):
             username=self.username, password=self.password)
         layer_name = self.layer
         if self.layer == 'Rain':
-            layer_name = '{} {}'.format(self.layer, self.from_datetime)
+            layer_name = '{} {} {}'.format(
+                self.layer, self.from_datetime, self.time_interval)
         return {'layer': self.layer, 'path': path,
                 'layer_name': layer_name}
 
@@ -446,8 +447,14 @@ class LizardViewer:
     def display_raster_layer(self, data):
         if data['path']:
             self.iface.addRasterLayer(data['path'], data['layer_name'])
-            qml_path = os.path.join(STYLES_ROOT,
-                                    "{}.qml".format(data['layer']))
+            if data['layer'] == 'Rain':
+                qml_path = os.path.join(
+                    STYLES_ROOT, "{} {}.qml".format(
+                        data['layer'],
+                        self.dockwidget.time_interval_combobox.currentText()))
+            else:
+                qml_path = os.path.join(
+                    STYLES_ROOT, "{}.qml".format(data['layer']))
             if os.path.exists(qml_path):
                 self.iface.activeLayer().loadNamedStyle(qml_path)
                 self.iface.legendInterface().refreshLayerSymbology(
