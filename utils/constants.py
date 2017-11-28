@@ -22,8 +22,6 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
 RASTER_TYPES = [
     'DEM Netherlands',
     'Land use',
-    'Land use old',
-    'NDVI Flevoland',
     'Rain'
 ]
 
@@ -37,16 +35,6 @@ RASTER_INFO = {
         'uuid': 'b464c2e4-b1f4-4af4-b9b8-6282461e941e',
         'raster_name': 'Landgebruik (oud)',
         'temporal': False,
-    },
-    'Land use old': {
-        'uuid': 'b92c5c3a-854e-47b8-a083-ae9bf1760496',
-        'raster_name': 'Landgebruik (oud)',
-        'temporal': False,
-    },
-    'NDVI Flevoland': {
-        'uuid': '920937b3-478c-4cac-bbd1-350ca6d52eff',
-        'raster_name': 'NDVI (FL)',
-        'temporal': True,
     },
     'Rain': {
         'uuid': '730d6675-35dd-4a35-aa9b-bfb8155f9ca7',
