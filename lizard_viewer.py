@@ -371,46 +371,60 @@ class LizardViewer:
             print from_epoch  # 1325286000
             from_datetime2 = time.strftime(pattern, time.localtime(from_epoch))
             print from_datetime2  # 2000-01-01 00:00
-            # Stop datetime
-            to_datetime = self.dockwidget.to_date_dateTimeEdit.dateTime()\
-                .toString("yyyy-MM-dd HH:mm:00")  # 2000-01-01 00:00
-            # ook mogelijk als yyyy-MM-ddTHH:mm:00Z
-            # (volgens docs raster store)?
-            to_epoch = int(time.mktime(time.strptime(to_datetime, pattern)))
-            print to_epoch
-            time_interval = str(self.dockwidget.time_interval_combobox
-                                .currentText())
+            time_interval = None
+            to_datetime = None
+
             if data_type == 'Rain':
-                window = 0
-                if time_interval == "5min":
-                    window = 300
-                elif time_interval == "hour":
-                    window = 3600
-                elif time_interval == "day":
-                    window = 86400
+                # Stop datetime
+                time_interval = str(self.dockwidget.time_interval_combobox
+                                    .currentText())
+                if self.dockwidget.to_date_checkbox.isChecked() is True:
+                    to_datetime = self.dockwidget.to_date_dateTimeEdit\
+                        .dateTime().toString("yyyy-MM-dd HH:mm:00")
+                    # 2000-01-01 00:00
+                    # ook mogelijk als yyyy-MM-ddTHH:mm:00Z
+                    # (volgens docs raster store)?
+                    to_epoch = int(time.mktime(time.strptime(
+                        to_datetime, pattern)))
+                    print to_epoch
+                    window = 0
+                    if time_interval == "5min":
+                        window = 300
+                    elif time_interval == "hour":
+                        window = 3600
+                    elif time_interval == "day":
+                        window = 86400
+                    else:
+                        window = 86400
+                    current_epoch = from_epoch
+                    while current_epoch < to_epoch:
+                        try:
+                            print current_epoch
+                            from_datetime = time.strftime(
+                                '%Y-%m-%d %H:%M:%S', time.localtime(
+                                    current_epoch))
+                            self.raster_worker = RasterWorker()
+                            self.raster_worker.start_(
+                                data_type, bbox,
+                                from_datetime,  # current_epoch
+                                to_datetime,
+                                time_interval,
+                                self.username, self.password)
+                            current_epoch += window
+                            self.raster_worker.output.connect(
+                                self.display_raster_layer)
+                            # creates the same raster
+                            print current_epoch, to_epoch
+                        except Exception:
+                            print Exception
+                            return
                 else:
-                    window = 86400
-                current_epoch = from_epoch
-                while current_epoch < to_epoch:
-                    try:
-                        print current_epoch
-                        from_datetime = time.strftime(
-                            '%Y-%m-%d %H:%M:%S', time.localtime(current_epoch))
-                        self.raster_worker = RasterWorker()
-                        self.raster_worker.start_(
-                            data_type, bbox,
-                            from_datetime,  # current_epoch
-                            to_datetime,
-                            time_interval,
-                            self.username, self.password)
-                        current_epoch += window
-                        self.raster_worker.output.connect(
-                            self.display_raster_layer)
-                        # creates the same raster
-                        print current_epoch, to_epoch
-                    except Exception:
-                        print Exception
-                        return
+                    self.raster_worker.start_(
+                        data_type, bbox,
+                        from_datetime,
+                        to_datetime,
+                        time_interval,
+                        self.username, self.password)
             # if self.from_date and self.to_date:
             # elif self.from_date:
             else:

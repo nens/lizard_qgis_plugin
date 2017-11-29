@@ -183,26 +183,13 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>10</y>
-         <width>68</width>
-         <height>17</height>
+         <y>11</y>
+         <width>91</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="text">
         <string>From</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="to_date_label">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>66</y>
-         <width>68</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>To</string>
        </property>
       </widget>
       <widget class="QDateTimeEdit" name="from_date_dateTimeEdit">
@@ -278,6 +265,32 @@
         <bool>true</bool>
        </property>
       </widget>
+      <widget class="QCheckBox" name="to_date_checkbox">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>60</y>
+         <width>99</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="layoutDirection">
+        <enum>Qt::LeftToRight</enum>
+       </property>
+       <property name="text">
+        <string>To</string>
+       </property>
+      </widget>
+      <zorder>view_data_button_private</zorder>
+      <zorder>area_combobox_private</zorder>
+      <zorder>area_label_private</zorder>
+      <zorder>time_interval_label</zorder>
+      <zorder>time_interval_combobox</zorder>
+      <zorder>from_date_label</zorder>
+      <zorder>from_date_dateTimeEdit</zorder>
+      <zorder>to_date_dateTimeEdit</zorder>
+      <zorder>checkBox</zorder>
+      <zorder>to_date_checkbox</zorder>
      </widget>
      <widget class="QPushButton" name="upload_data_button_private">
       <property name="geometry">
