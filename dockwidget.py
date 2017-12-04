@@ -8,6 +8,7 @@ from PyQt4 import QtGui, uic
 # from PyQt4.uic import QUiLoader
 # from PyQt4.QtGui import QFile
 from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import QDateTime
 
 from .utils.constants import AREA_FILTERS
 from .utils.constants import ASSET_TYPES
@@ -132,6 +133,14 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Function to reset the data."""
         self.data_type_combobox_private.setCurrentIndex(0)
         self.data_type_combobox_public.setCurrentIndex(0)
+
+    def set_maximum_datetime(self):
+        """
+        Set the maximum datetime of the QDateTimeEdit to the current day 23:59.
+        """
+        current_datetime = QDateTime.currentDateTime()
+        self.from_date_dateTimeEdit.setMaximumDateTime(current_datetime)
+        self.to_date_dateTimeEdit.setMaximumDateTime(current_datetime)
 
     def set_all_status_bars_text(self, string):
         """Set the text for the status bars."""

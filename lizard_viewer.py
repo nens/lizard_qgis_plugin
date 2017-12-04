@@ -298,6 +298,7 @@ class LizardViewer:
                 self.dockwidget.add_datatypes_to_combobox()
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_areafilters_to_combobox()
+                self.dockwidget.set_maximum_datetime()
                 # Go to the select data tab
                 self.dockwidget.change_tab(TAB_PRIVATE_DATA)
                 # Connect the login button of the private data tab with
@@ -403,7 +404,6 @@ class LizardViewer:
                             from_datetime = time.strftime(
                                 '%Y-%m-%d %H:%M:%S', time.localtime(
                                     current_epoch))
-                            self.raster_worker = RasterWorker()
                             self.raster_worker.start_(
                                 data_type, bbox,
                                 from_datetime,  # current_epoch
@@ -411,9 +411,6 @@ class LizardViewer:
                                 time_interval,
                                 self.username, self.password)
                             current_epoch += window
-                            self.raster_worker.output.connect(
-                                self.display_raster_layer)
-                            # creates the same raster
                             print current_epoch, to_epoch
                         except Exception:
                             print Exception
