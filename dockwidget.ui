@@ -203,9 +203,9 @@
        </property>
        <property name="maximumDate">
         <date>
-         <year>7917</year>
-         <month>11</month>
-         <day>22</day>
+         <year>2017</year>
+         <month>12</month>
+         <day>31</day>
         </date>
        </property>
        <property name="minimumDate">
@@ -238,21 +238,21 @@
         <date>
          <year>2017</year>
          <month>12</month>
-         <day>5</day>
+         <day>05</day>
         </date>
        </property>
        <property name="maximumDate">
         <date>
-         <year>7917</year>
-         <month>11</month>
-         <day>22</day>
+         <year>2017</year>
+         <month>12</month>
+         <day>31</day>
         </date>
        </property>
        <property name="minimumDate">
         <date>
          <year>2009</year>
-         <month>12</month>
-         <day>31</day>
+         <month>01</month>
+         <day>01</day>
         </date>
        </property>
        <property name="currentSection">
