@@ -121,22 +121,10 @@ def fetch_layer_from_server(
             'start': '',
             'stop': '',
         })
-    # loop from_epoch (from_date)
-    # print window
-    # if RASTER_INFO[layer]['raster_name'] == 'Regen':
-    #     parameters.update({
-    #         'time': '',
-    #         'start': '',
-    #         'stop': '',
-    #         'window': '3600000'
-    #     })
     if RASTER_INFO[layer]['raster_name'] == 'Regen':
         parameters.update({
             'time': from_datetime,
-            # 'start': '2017-12-06T08:20:14',
-            # 'stop': '2017-12-13T10:25:57',
-            # 'window': '3600000'
-        })  # https://demo.lizard.net/api/v3/raster-aggregates/?agg=average&geom=POLYGON+((-12.3046875+57.136239319177434,+23.9501953125+57.136239319177434,+23.9501953125+50.47149085139956,+-12.3046875+50.47149085139956,+-12.3046875+57.136239319177434))&rasters=730d667&srs=EPSG:4326&start=2017-12-06T08:20:14&stop=2017-12-13T10:25:57&window=86400000
+        })
     layer_uuid = RASTER_INFO[layer]["uuid"]
 
     url = '{path}?{pars}'.format(

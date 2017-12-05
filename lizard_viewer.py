@@ -362,29 +362,21 @@ class LizardViewer:
                 data_type, payload, self.username, self.password)
         elif data_type in RASTER_TYPES:
             bbox = get_bbox(self.iface)
-            # Start datetime
             from_datetime = self.dockwidget.from_date_dateTimeEdit.dateTime()\
                 .toString("yyyy-MM-dd HH:mm:00")
-            print from_datetime  # 2000-01-01 00:00
             pattern = "%Y-%m-%d %H:%M:%S"
             from_epoch = int(time.mktime(time.strptime(
                 from_datetime, pattern)))
-            print from_epoch  # 1325286000
             from_datetime2 = time.strftime(pattern, time.localtime(from_epoch))
-            print from_datetime2  # 2000-01-01 00:00
             time_interval = None
             to_datetime = None
 
             if data_type == 'Rain':
-                # Stop datetime
                 time_interval = str(self.dockwidget.time_interval_combobox
                                     .currentText())
                 if self.dockwidget.to_date_checkbox.isChecked() is True:
                     to_datetime = self.dockwidget.to_date_dateTimeEdit\
                         .dateTime().toString("yyyy-MM-dd HH:mm:00")
-                    # 2000-01-01 00:00
-                    # ook mogelijk als yyyy-MM-ddTHH:mm:00Z
-                    # (volgens docs raster store)?
                     to_epoch = int(time.mktime(time.strptime(
                         to_datetime, pattern)))
                     print to_epoch
@@ -422,8 +414,6 @@ class LizardViewer:
                         to_datetime,
                         time_interval,
                         self.username, self.password)
-            # if self.from_date and self.to_date:
-            # elif self.from_date:
             else:
                 self.raster_worker.start_(
                     data_type, bbox,

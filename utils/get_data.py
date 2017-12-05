@@ -56,7 +56,6 @@ def retrieve_data_from_lizard(username, password, asset_type, payload):
     }
 
     while current_amount < max_amount:
-        # show_message("Downloading {}...".format(asset_type))
         # Create a task to download the JSON async
         task_start_url = "{}{}/".format(BASE_URL, asset_type)
         task_start_json = send_request(
