@@ -378,8 +378,8 @@ class LizardViewer:
                     stop_epoch = int(time.mktime(time.strptime(
                         stop_datetime, pattern)))
                     self.show_temporal_raster(
-                        data_type, bbox, start_epoch,
-                        time_interval, stop_epoch)
+                        data_type, bbox, self.username, self.password,
+                        start_epoch, time_interval, stop_epoch)
                 else:
                     self.raster_worker.start_(
                         data_type, bbox, self.username, self.password,
