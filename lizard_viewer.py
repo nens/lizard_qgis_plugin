@@ -13,6 +13,7 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
+import time
 # Initialize Qt resources from file resources.py
 import resources  # noqa
 
@@ -23,7 +24,9 @@ from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
 from .utils.constants import DATA_TYPES
+from .utils.constants import RASTER_INFO
 from .utils.constants import RASTER_TYPES
+from .utils.constants import RASTER_WINDOWS
 from .utils.constants import ERROR_LEVEL_CRITICAL
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import ERROR_LEVEL_WARNING
@@ -92,17 +95,17 @@ class AssetWorker(QThread):
 
 class RasterWorker(AssetWorker):
     def start_(self, layer, bbox,
-               from_datetime, to_datetime, time_interval,
-               username, password):
+               username, password,
+               from_datetime=None, time_interval=None, to_datetime=None):
         self.layer = layer
         self._bbox = bbox
         self.bbox = BoundingBox(self._bbox)
         self.width, self.height = calc_request_width_height(self.bbox)
+        self.username = username
+        self.password = password
         self.from_datetime = from_datetime
         self.to_datetime = to_datetime
         self.time_interval = time_interval
-        self.username = username
-        self.password = password
         self.start()
 
     def _get_data(self):
@@ -367,11 +370,11 @@ class LizardViewer:
             pattern = "%Y-%m-%d %H:%M:%S"
             from_epoch = int(time.mktime(time.strptime(
                 from_datetime, pattern)))
-            from_datetime2 = time.strftime(pattern, time.localtime(from_epoch))
             time_interval = None
             to_datetime = None
 
-            if data_type == 'Rain':
+            is_temporal = RASTER_INFO[data_type]['temporal']
+            if is_temporal:
                 time_interval = str(self.dockwidget.time_interval_combobox
                                     .currentText())
                 if self.dockwidget.to_date_checkbox.isChecked() is True:
@@ -379,48 +382,26 @@ class LizardViewer:
                         .dateTime().toString("yyyy-MM-dd HH:mm:00")
                     to_epoch = int(time.mktime(time.strptime(
                         to_datetime, pattern)))
-                    print to_epoch
-                    window = 0
-                    if time_interval == "5min":
-                        window = 300
-                    elif time_interval == "hour":
-                        window = 3600
-                    elif time_interval == "day":
-                        window = 86400
-                    else:
-                        window = 86400
+                    window = RASTER_WINDOWS[time_interval]
                     current_epoch = from_epoch
                     while current_epoch < to_epoch:
-                        try:
-                            print current_epoch
-                            from_datetime = time.strftime(
-                                '%Y-%m-%d %H:%M:%S', time.localtime(
-                                    current_epoch))
-                            self.raster_worker.start_(
-                                data_type, bbox,
-                                from_datetime,  # current_epoch
-                                to_datetime,
-                                time_interval,
-                                self.username, self.password)
-                            current_epoch += window
-                            print current_epoch, to_epoch
-                        except Exception:
-                            print Exception
-                            return
+                        current_datetime = time.strftime(
+                            '%Y-%m-%d %H:%M:%S', time.localtime(
+                                current_epoch))
+                        self.raster_worker.start_(
+                            data_type, bbox, self.username, self.password,
+                            current_datetime, time_interval, to_datetime)
+                        # Insert sleep to make sure the raster_worker is done.
+                        # Otherwise, not al rasters are downloaded.
+                        time.sleep(0.25)
+                        current_epoch += window
                 else:
                     self.raster_worker.start_(
-                        data_type, bbox,
-                        from_datetime,
-                        to_datetime,
-                        time_interval,
-                        self.username, self.password)
+                        data_type, bbox, self.username, self.password,
+                        from_datetime, time_interval)
             else:
                 self.raster_worker.start_(
-                    data_type, bbox,
-                    from_datetime,
-                    to_datetime,
-                    time_interval,
-                    self.username, self.password)
+                    data_type, bbox, self.username, self.password)
 
     def display_asset_layer(self, data):
         """

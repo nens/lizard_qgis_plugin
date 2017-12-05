@@ -69,11 +69,11 @@ class BoundingBox(object):
 
 def fetch_layer_from_server(
         bbox, width, height, dt=None,
+        username=None, password=None,
         from_datetime=None,
         to_datetime=None,
         time_interval=None,
         srs='epsg:4326', layer='DEM Netherlands',
-        username=None, password=None,
         server='https://demo.lizard.net/api/v3/rasters/'):
     """
     Fetches rain data from raster server.
@@ -112,7 +112,6 @@ def fetch_layer_from_server(
     }
 
     is_temporal = RASTER_INFO[layer]['temporal']
-
     # unfortunately, raster endpoint doesn't like to accept all parameters,
     # which is why it's done like this
     if is_temporal:

@@ -24,7 +24,11 @@ RASTER_TYPES = [
     'Land use',
     'Rain'
 ]
-
+RASTER_WINDOWS = {
+    '5min': 300,
+    'hour': 3600,
+    'day': 86400
+}
 RASTER_INFO = {
     'DEM Netherlands': {
         'uuid': '1d65a4e1-ac2f-4e66-9e52-1d130d870a34',
