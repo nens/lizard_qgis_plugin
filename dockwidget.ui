@@ -211,8 +211,8 @@
        <property name="minimumDate">
         <date>
          <year>2009</year>
-         <month>12</month>
-         <day>31</day>
+         <month>01</month>
+         <day>01</day>
         </date>
        </property>
        <property name="currentSection">
