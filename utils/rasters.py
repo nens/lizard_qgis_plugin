@@ -12,7 +12,6 @@ import urlparse
 
 from .constants import RASTER_INFO
 from .get_data import use_header
-# from .get_data import retrieve_raster_uuid_from_lizard
 
 # 1 pixel is 1 km x 1 km, so we should be good for now; if rain resolution
 # increases, we might want to redefine this desired array size

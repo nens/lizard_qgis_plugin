@@ -102,26 +102,6 @@ def retrieve_data_from_lizard(username, password, asset_type, payload):
     return data
 
 
-def retrieve_raster_uuid_from_lizard(username, password, raster_name):
-    """
-    Args:
-        (str) username: The username for logging into lizard.
-        (str) password: The password for logging into Lizard.
-        (str) raster_name: The name of the raster in Lizard.
-
-    Returns:
-        (str) uuid: The uuid of the raster with the name raster_name.
-    """
-    payload = {
-        'format': 'json',
-        'name': raster_name
-    }
-    url = 'https://demo.lizard.net/api/v3/rasters/'
-    result_json = send_request(url, username, password, payload)
-    uuid = result_json["results"][0]["uuid"]
-    return uuid
-
-
 def get_max_amount(username, password, asset_type, payload):
     """
     Function to get the max amount of assets of an asset type.

@@ -115,7 +115,8 @@ class RasterWorker(AssetWorker):
             username=self.username, password=self.password,
             start_datetime=self.start_datetime, layer=self.layer)
         layer_name = self.layer
-        if self.layer == 'Rain':
+        is_temporal = RASTER_INFO[self.layer]['temporal']
+        if is_temporal:
             layer_name = '{} {} {}'.format(
                 self.layer, self.start_datetime, self.time_interval)
         return {'layer': self.layer, 'path': path, 'layer_name': layer_name}
@@ -388,8 +389,8 @@ class LizardViewer:
                 self.raster_worker.start_(
                     data_type, bbox, self.username, self.password)
 
-    def show_temporal_raster(self, data_type, bbox, start_epoch, time_interval,
-                stop_epoch):
+    def show_temporal_raster(self, data_type, bbox, username, password,
+            start_epoch, time_interval, stop_epoch):
         """
         Show rasters though time, starting with the start_epoch and showing
         till the stop_epoch.

@@ -37,7 +37,6 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
-        # self.add_selection_for_data("Rain")
 
     def closeEvent(self, event):
         """Module for closing the dockwidget."""
