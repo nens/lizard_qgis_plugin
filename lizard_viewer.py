@@ -370,31 +370,14 @@ class LizardViewer:
             pattern = "%Y-%m-%d %H:%M:%S"
             from_epoch = int(time.mktime(time.strptime(
                 from_datetime, pattern)))
-            time_interval = None
-            to_datetime = None
-
             is_temporal = RASTER_INFO[data_type]['temporal']
             if is_temporal:
                 time_interval = str(self.dockwidget.time_interval_combobox
                                     .currentText())
                 if self.dockwidget.to_date_checkbox.isChecked() is True:
-                    to_datetime = self.dockwidget.to_date_dateTimeEdit\
-                        .dateTime().toString("yyyy-MM-dd HH:mm:00")
-                    to_epoch = int(time.mktime(time.strptime(
-                        to_datetime, pattern)))
-                    window = RASTER_WINDOWS[time_interval]
-                    current_epoch = from_epoch
-                    while current_epoch < to_epoch:
-                        current_datetime = time.strftime(
-                            '%Y-%m-%d %H:%M:%S', time.localtime(
-                                current_epoch))
-                        self.raster_worker.start_(
-                            data_type, bbox, self.username, self.password,
-                            current_datetime, time_interval, to_datetime)
-                        # Insert sleep to make sure the raster_worker is done.
-                        # Otherwise, not al rasters are downloaded.
-                        time.sleep(0.25)
-                        current_epoch += window
+                    self.show_temporal_raster(
+                        data_type, bbox, pattern, from_epoch,
+                        time_interval)
                 else:
                     self.raster_worker.start_(
                         data_type, bbox, self.username, self.password,
@@ -402,6 +385,27 @@ class LizardViewer:
             else:
                 self.raster_worker.start_(
                     data_type, bbox, self.username, self.password)
+
+    def show_temporal_raster(self, data_type, bbox, pattern, from_epoch,
+            time_interval):
+        to_datetime = self.dockwidget.to_date_dateTimeEdit\
+            .dateTime().toString("yyyy-MM-dd HH:mm:00")
+        to_epoch = int(time.mktime(time.strptime(
+            to_datetime, pattern)))
+        window = RASTER_WINDOWS[time_interval]
+        current_epoch = from_epoch
+        while current_epoch < to_epoch:
+            current_datetime = time.strftime(
+                '%Y-%m-%d %H:%M:%S', time.localtime(
+                    current_epoch))
+            self.raster_worker.start_(
+                data_type, bbox, self.username, self.password,
+                current_datetime, time_interval, to_datetime)
+            # Insert sleep to make sure the raster_worker is done.
+            # Otherwise, not al rasters are downloaded.
+            time.sleep(0.25)
+            current_epoch += window
+
 
     def display_asset_layer(self, data):
         """
