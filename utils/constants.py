@@ -19,6 +19,7 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
                         "outlets": "Point", "overflows": "Point",
                         "pumpstations": "Point", "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
+DATETIME_PATTERN = "%Y-%m-%d %H:%M:%S"
 RASTER_TYPES = [
     'DEM Netherlands',
     'Land use',

@@ -24,6 +24,7 @@ from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
 from .utils.constants import DATA_TYPES
+from .utils.constants import DATETIME_PATTERN
 from .utils.constants import RASTER_INFO
 from .utils.constants import RASTER_TYPES
 from .utils.constants import RASTER_WINDOWS
@@ -96,30 +97,30 @@ class AssetWorker(QThread):
 class RasterWorker(AssetWorker):
     def start_(self, layer, bbox,
                username, password,
-               from_datetime=None, time_interval=None, to_datetime=None):
+               start_datetime=None, time_interval=None, stop_datetime=None):
         self.layer = layer
         self._bbox = bbox
         self.bbox = BoundingBox(self._bbox)
         self.width, self.height = calc_request_width_height(self.bbox)
         self.username = username
         self.password = password
-        self.from_datetime = from_datetime
-        self.to_datetime = to_datetime
+        self.start_datetime = start_datetime
+        self.stop_datetime = stop_datetime
         self.time_interval = time_interval
         self.start()
 
     def _get_data(self):
         path = fetch_layer_from_server(
             self.bbox, self.width, self.height,
-            from_datetime=self.from_datetime,
-            to_datetime=self.to_datetime,
+            start_datetime=self.start_datetime,
+            stop_datetime=self.stop_datetime,
             time_interval=self.time_interval,
             layer=self.layer,
             username=self.username, password=self.password)
         layer_name = self.layer
         if self.layer == 'Rain':
             layer_name = '{} {} {}'.format(
-                self.layer, self.from_datetime, self.time_interval)
+                self.layer, self.start_datetime, self.time_interval)
         return {'layer': self.layer, 'path': path, 'layer_name': layer_name}
 
 
@@ -365,42 +366,53 @@ class LizardViewer:
                 data_type, payload, self.username, self.password)
         elif data_type in RASTER_TYPES:
             bbox = get_bbox(self.iface)
-            from_datetime = self.dockwidget.from_date_dateTimeEdit.dateTime()\
+            start_datetime = self.dockwidget.from_date_dateTimeEdit.dateTime()\
                 .toString("yyyy-MM-dd HH:mm:00")
-            pattern = "%Y-%m-%d %H:%M:%S"
-            from_epoch = int(time.mktime(time.strptime(
-                from_datetime, pattern)))
+            pattern = DATETIME_PATTERN
+            start_epoch = int(time.mktime(time.strptime(
+                start_datetime, pattern)))
             is_temporal = RASTER_INFO[data_type]['temporal']
             if is_temporal:
                 time_interval = str(self.dockwidget.time_interval_combobox
                                     .currentText())
                 if self.dockwidget.to_date_checkbox.isChecked() is True:
+                    stop_datetime = self.dockwidget.to_date_dateTimeEdit\
+                        .dateTime().toString("yyyy-MM-dd HH:mm:00")
+                    stop_epoch = int(time.mktime(time.strptime(
+                        stop_datetime, pattern)))
                     self.show_temporal_raster(
-                        data_type, bbox, pattern, from_epoch,
-                        time_interval)
+                        data_type, bbox, start_epoch,
+                        time_interval, stop_epoch)
                 else:
                     self.raster_worker.start_(
                         data_type, bbox, self.username, self.password,
-                        from_datetime, time_interval)
+                        start_datetime, time_interval)
             else:
                 self.raster_worker.start_(
                     data_type, bbox, self.username, self.password)
 
-    def show_temporal_raster(self, data_type, bbox, pattern, from_epoch,
-            time_interval):
-        to_datetime = self.dockwidget.to_date_dateTimeEdit\
-            .dateTime().toString("yyyy-MM-dd HH:mm:00")
-        to_epoch = int(time.mktime(time.strptime(
-            to_datetime, pattern)))
+    def show_temporal_raster(self, data_type, bbox, start_epoch, time_interval,
+                stop_epoch):
+        """
+        Show rasters though time, starting with the start_epoch and showing
+        till the stop_epoch.
+
+        Args:
+            (str) data_type: The name of the data type in the combobox.
+            (int) start_epoch: The start epoch for downloading the
+                rasters.
+            (str) time_interval: The time interval between the rasters.
+                Possible options are 'day', 'hour', and '5min'.
+            (int) stop_epoch: The stop epoch for downloading the rasters.
+        """
+        current_epoch = start_epoch
         window = RASTER_WINDOWS[time_interval]
-        current_epoch = from_epoch
-        while current_epoch < to_epoch:
+        while current_epoch < stop_epoch:
             current_datetime = time.strftime(
-                '%Y-%m-%d %H:%M:%S', time.localtime(
-                    current_epoch))
+                DATETIME_PATTERN, time.localtime(current_epoch))
             self.raster_worker.start_(
                 data_type, bbox, self.username, self.password,
-                current_datetime, time_interval, to_datetime)
+                current_datetime, time_interval)
             # Insert sleep to make sure the raster_worker is done.
             # Otherwise, not al rasters are downloaded.
             time.sleep(0.25)

@@ -70,8 +70,8 @@ class BoundingBox(object):
 def fetch_layer_from_server(
         bbox, width, height, dt=None,
         username=None, password=None,
-        from_datetime=None,
-        to_datetime=None,
+        start_datetime=None,
+        stop_datetime=None,
         time_interval=None,
         srs='epsg:4326', layer='DEM Netherlands',
         server='https://demo.lizard.net/api/v3/rasters/'):
@@ -122,7 +122,7 @@ def fetch_layer_from_server(
         })
     if RASTER_INFO[layer]['raster_name'] == 'Regen':
         parameters.update({
-            'time': from_datetime,
+            'time': start_datetime,
         })
     layer_uuid = RASTER_INFO[layer]["uuid"]
 
