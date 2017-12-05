@@ -68,19 +68,15 @@ class BoundingBox(object):
 
 
 def fetch_layer_from_server(
-        bbox, width, height, dt=None,
-        username=None, password=None,
-        start_datetime=None,
-        stop_datetime=None,
-        time_interval=None,
-        srs='epsg:4326', layer='DEM Netherlands',
+        bbox, width, height, username=None, password=None,
+        start_datetime=None, srs='epsg:4326', layer='DEM Netherlands',
         server='https://demo.lizard.net/api/v3/rasters/'):
     """
     Fetches rain data from raster server.
     :param bbox: instance of BoundingBox class
     :param width/height: request width and height in pixels; the response
         width and height will be the same
-    :param dt: datetime instance used for the time parameter for
+    :param start_datetime: datetime instance used for the time parameter for
         the raster store request
     :param srs: epsg string (default = 'epsg:4326' (wgs84))
     :param layer: get parameters specifying the requested layer from the
@@ -90,17 +86,6 @@ def fetch_layer_from_server(
     :return error code and numpy instance of the rain radar data (or None in
         case of an error)
     """
-    logger.debug("bbox, width, height, datetime: %s, %f, %f, %s",
-                 str(bbox), width, height, str(dt))
-
-    if dt:
-        dt_rep_official = dt.isoformat()
-        try:
-            dt_rep, _ = dt_rep_official.split("+")
-        except ValueError:
-            dt_rep = dt_rep_official
-    else:
-        dt_rep = ''
 
     parameters = {
         'srs': srs,
@@ -116,13 +101,9 @@ def fetch_layer_from_server(
     # which is why it's done like this
     if is_temporal:
         parameters.update({
-            'time': dt_rep,
+            'time': start_datetime,
             'start': '',
             'stop': '',
-        })
-    if RASTER_INFO[layer]['raster_name'] == 'Regen':
-        parameters.update({
-            'time': start_datetime,
         })
     layer_uuid = RASTER_INFO[layer]["uuid"]
 

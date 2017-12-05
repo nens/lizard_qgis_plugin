@@ -105,18 +105,15 @@ class RasterWorker(AssetWorker):
         self.username = username
         self.password = password
         self.start_datetime = start_datetime
-        self.stop_datetime = stop_datetime
         self.time_interval = time_interval
+        self.stop_datetime = stop_datetime
         self.start()
 
     def _get_data(self):
         path = fetch_layer_from_server(
             self.bbox, self.width, self.height,
-            start_datetime=self.start_datetime,
-            stop_datetime=self.stop_datetime,
-            time_interval=self.time_interval,
-            layer=self.layer,
-            username=self.username, password=self.password)
+            username=self.username, password=self.password,
+            start_datetime=self.start_datetime, layer=self.layer)
         layer_name = self.layer
         if self.layer == 'Rain':
             layer_name = '{} {} {}'.format(
