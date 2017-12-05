@@ -13,7 +13,6 @@ from PyQt4.QtCore import QTranslator
 from PyQt4.QtCore import qVersion
 from PyQt4.QtGui import QAction
 from PyQt4.QtGui import QIcon
-import time
 # Initialize Qt resources from file resources.py
 import resources  # noqa
 
