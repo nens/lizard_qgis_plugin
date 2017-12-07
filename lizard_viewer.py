@@ -412,7 +412,7 @@ class LizardViewer:
                 current_datetime, time_interval)
             # Insert sleep to make sure the raster_worker is done.
             # Otherwise, not al rasters are downloaded.
-            time.sleep(0.25)
+            time.sleep(0.75)
             current_epoch += window
 
 
