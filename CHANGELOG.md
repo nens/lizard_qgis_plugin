@@ -4,7 +4,7 @@
 0.11 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Add rasters (DEM Netherlands, Land use and Rain).
 
 
 0.10 (2017-10-19)

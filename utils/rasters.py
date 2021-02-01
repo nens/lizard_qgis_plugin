@@ -67,15 +67,15 @@ class BoundingBox(object):
 
 
 def fetch_layer_from_server(
-        bbox, width, height, dt=None, srs='epsg:4326', layer='dem:nl',
-        username=None, password=None,
+        bbox, width, height, username=None, password=None,
+        start_datetime=None, srs='epsg:4326', layer='DEM Netherlands',
         server='https://demo.lizard.net/api/v3/rasters/'):
     """
     Fetches rain data from raster server.
     :param bbox: instance of BoundingBox class
     :param width/height: request width and height in pixels; the response
         width and height will be the same
-    :param dt: datetime instance used for the time parameter for
+    :param start_datetime: datetime instance used for the time parameter for
         the raster store request
     :param srs: epsg string (default = 'epsg:4326' (wgs84))
     :param layer: get parameters specifying the requested layer from the
@@ -85,17 +85,6 @@ def fetch_layer_from_server(
     :return error code and numpy instance of the rain radar data (or None in
         case of an error)
     """
-    logger.debug("bbox, width, height, datetime: %s, %f, %f, %s",
-                 str(bbox), width, height, str(dt))
-
-    if dt:
-        dt_rep_official = dt.isoformat()
-        try:
-            dt_rep, _ = dt_rep_official.split("+")
-        except ValueError:
-            dt_rep = dt_rep_official
-    else:
-        dt_rep = ''
 
     parameters = {
         'srs': srs,
@@ -103,20 +92,19 @@ def fetch_layer_from_server(
         'height': height,
         'format': 'geotiff',
         'geom': bbox.geom
+        # 'async': True
     }
 
     is_temporal = RASTER_INFO[layer]['temporal']
-
     # unfortunately, raster endpoint doesn't like to accept all parameters,
     # which is why it's done like this
     if is_temporal:
         parameters.update({
-            'time': dt_rep,
+            'time': start_datetime,
             'start': '',
             'stop': '',
         })
-
-    layer_uuid = RASTER_INFO[layer]['uuid']
+    layer_uuid = RASTER_INFO[layer]["uuid"]
 
     url = '{path}?{pars}'.format(
         pars=urllib.urlencode(parameters),

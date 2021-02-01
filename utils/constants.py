@@ -19,24 +19,32 @@ ASSET_GEOMETRY_TYPES = {"bridges": "Point", "culverts": "LineString",
                         "outlets": "Point", "overflows": "Point",
                         "pumpstations": "Point", "sluices": "Point",
                         "wastewatertreatmentplants": "Point", "weirs": "Point"}
+DATETIME_PATTERN = "%Y-%m-%d %H:%M:%S"
 RASTER_TYPES = [
-    'dem:nl',
-    'extern:nl:flevoland',
-    'cover:fun',
+    'DEM Netherlands',
+    'Land use',
+    'Rain'
 ]
-
+RASTER_WINDOWS = {
+    '5min': 300,
+    'hour': 3600,
+    'day': 86400
+}
 RASTER_INFO = {
-    'dem:nl': {
+    'DEM Netherlands': {
         'uuid': '1d65a4e1-ac2f-4e66-9e52-1d130d870a34',
+        'raster_name': 'Hoogte',
         'temporal': False
     },
-    'extern:nl:flevoland': {
-        'uuid': '920937b3-478c-4cac-bbd1-350ca6d52eff',
-        'temporal': True,
-    },
-    'cover:fun': {
-        'uuid': 'b92c5c3a-854e-47b8-a083-ae9bf1760496',
+    'Land use': {
+        'uuid': 'b464c2e4-b1f4-4af4-b9b8-6282461e941e',
+        'raster_name': 'Landgebruik (oud)',
         'temporal': False,
+    },
+    'Rain': {
+        'uuid': '730d6675-35dd-4a35-aa9b-bfb8155f9ca7',
+        'raster_name': 'Regen',
+        'temporal': True,
     }
 }
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module containing the main file for the QGIS Lizard plug-in."""
 import os.path
+import time
 import urllib2
 
 from PyQt4.QtCore import pyqtSignal
@@ -22,10 +23,14 @@ from .dockwidget import TAB_PUBLIC_DATA
 from .log_in_dialog import LogInDialog
 from .utils.constants import ASSET_TYPES
 from .utils.constants import DATA_TYPES
+from .utils.constants import DATETIME_PATTERN
+from .utils.constants import RASTER_INFO
 from .utils.constants import RASTER_TYPES
+from .utils.constants import RASTER_WINDOWS
 from .utils.constants import ERROR_LEVEL_CRITICAL
 from .utils.constants import ERROR_LEVEL_SUCCESS
 from .utils.constants import ERROR_LEVEL_WARNING
+from .utils.constants import STYLES_ROOT
 from .utils.get_data import retrieve_data_from_lizard
 from .utils.geometry import add_area_filter
 from .utils.geometry import get_bbox
@@ -89,20 +94,31 @@ class AssetWorker(QThread):
 
 
 class RasterWorker(AssetWorker):
-    def start_(self, layer, bbox, username, password):
+    def start_(self, layer, bbox,
+               username, password,
+               start_datetime=None, time_interval=None, stop_datetime=None):
         self.layer = layer
         self._bbox = bbox
         self.bbox = BoundingBox(self._bbox)
         self.width, self.height = calc_request_width_height(self.bbox)
         self.username = username
         self.password = password
+        self.start_datetime = start_datetime
+        self.time_interval = time_interval
+        self.stop_datetime = stop_datetime
         self.start()
 
     def _get_data(self):
         path = fetch_layer_from_server(
-            self.bbox, self.width, self.height, layer=self.layer,
-            username=self.username, password=self.password)
-        return {'layer': self.layer, 'path': path}
+            self.bbox, self.width, self.height,
+            username=self.username, password=self.password,
+            start_datetime=self.start_datetime, layer=self.layer)
+        layer_name = self.layer
+        is_temporal = RASTER_INFO[self.layer]['temporal']
+        if is_temporal:
+            layer_name = '{} {} {}'.format(
+                self.layer, self.start_datetime, self.time_interval)
+        return {'layer': self.layer, 'path': path, 'layer_name': layer_name}
 
 
 class LizardViewer:
@@ -280,9 +296,10 @@ class LizardViewer:
                 # Create the dockwidget (after translation) and keep reference
                 self.dockwidget = LizardViewerDockWidget()
                 # Add the asset types to the data type comboboxes
-                self.dockwidget.add_datatypes_to_combobox(DATA_TYPES)
+                self.dockwidget.add_datatypes_to_combobox()
                 # Add the asset types to the data type comboboxes
                 self.dockwidget.add_areafilters_to_combobox()
+                self.dockwidget.set_maximum_datetime()
                 # Go to the select data tab
                 self.dockwidget.change_tab(TAB_PRIVATE_DATA)
                 # Connect the login button of the private data tab with
@@ -346,8 +363,58 @@ class LizardViewer:
                 data_type, payload, self.username, self.password)
         elif data_type in RASTER_TYPES:
             bbox = get_bbox(self.iface)
+            start_datetime = self.dockwidget.from_date_dateTimeEdit.dateTime()\
+                .toString("yyyy-MM-dd HH:mm:00")
+            pattern = DATETIME_PATTERN
+            start_epoch = int(time.mktime(time.strptime(
+                start_datetime, pattern)))
+            is_temporal = RASTER_INFO[data_type]['temporal']
+            if is_temporal:
+                time_interval = str(self.dockwidget.time_interval_combobox
+                                    .currentText())
+                if self.dockwidget.to_date_checkbox.isChecked() is True:
+                    stop_datetime = self.dockwidget.to_date_dateTimeEdit\
+                        .dateTime().toString("yyyy-MM-dd HH:mm:00")
+                    stop_epoch = int(time.mktime(time.strptime(
+                        stop_datetime, pattern)))
+                    self.show_temporal_raster(
+                        data_type, bbox, self.username, self.password,
+                        start_epoch, time_interval, stop_epoch)
+                else:
+                    self.raster_worker.start_(
+                        data_type, bbox, self.username, self.password,
+                        start_datetime, time_interval)
+            else:
+                self.raster_worker.start_(
+                    data_type, bbox, self.username, self.password)
+
+    def show_temporal_raster(self, data_type, bbox, username, password,
+            start_epoch, time_interval, stop_epoch):
+        """
+        Show rasters though time, starting with the start_epoch and showing
+        till the stop_epoch.
+
+        Args:
+            (str) data_type: The name of the data type in the combobox.
+            (int) start_epoch: The start epoch for downloading the
+                rasters.
+            (str) time_interval: The time interval between the rasters.
+                Possible options are 'day', 'hour', and '5min'.
+            (int) stop_epoch: The stop epoch for downloading the rasters.
+        """
+        current_epoch = start_epoch
+        window = RASTER_WINDOWS[time_interval]
+        while current_epoch < stop_epoch:
+            current_datetime = time.strftime(
+                DATETIME_PATTERN, time.localtime(current_epoch))
             self.raster_worker.start_(
-                data_type, bbox, self.username, self.password)
+                data_type, bbox, self.username, self.password,
+                current_datetime, time_interval)
+            # Insert sleep to make sure the raster_worker is done.
+            # Otherwise, not al rasters are downloaded.
+            time.sleep(0.25)
+            current_epoch += window
+
 
     def display_asset_layer(self, data):
         """
@@ -378,7 +445,19 @@ class LizardViewer:
 
     def display_raster_layer(self, data):
         if data['path']:
-            self.iface.addRasterLayer(data['path'], data['layer'])
+            self.iface.addRasterLayer(data['path'], data['layer_name'])
+            if data['layer'] == 'Rain':
+                qml_path = os.path.join(
+                    STYLES_ROOT, "{} {}.qml".format(
+                        data['layer'],
+                        self.dockwidget.time_interval_combobox.currentText()))
+            else:
+                qml_path = os.path.join(
+                    STYLES_ROOT, "{}.qml".format(data['layer']))
+            if os.path.exists(qml_path):
+                self.iface.activeLayer().loadNamedStyle(qml_path)
+                self.iface.legendInterface().refreshLayerSymbology(
+                    self.iface.activeLayer())
             show_message(
                 "Downloaded %s" % data['layer'], ERROR_LEVEL_SUCCESS)
         else:

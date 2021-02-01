@@ -5,8 +5,11 @@ import os
 
 from PyQt4 import QtGui, uic
 from PyQt4.QtCore import pyqtSignal
+from PyQt4.QtCore import QDateTime
 
 from .utils.constants import AREA_FILTERS
+from .utils.constants import ASSET_TYPES
+from .utils.constants import RASTER_TYPES
 from .utils.constants import STYLES_ROOT
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -54,9 +57,9 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         elif tab_constant == TAB_PUBLIC_DATA:
             self.tabWidget.setCurrentIndex(1)
 
-    def add_datatypes_to_combobox(self, asset_types):
+    def add_datatypes_to_combobox(self):
         """Add an asterisk for asset types that don't have styling."""
-        for asset_type in asset_types:
+        for asset_type in ASSET_TYPES:
             qml_path = os.path.join(STYLES_ROOT, "{}.qml".format(asset_type))
             svg_path = os.path.join(STYLES_ROOT, "{}.svg".format(asset_type))
             # Check if the QML exists
@@ -64,6 +67,13 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
                 asset_type = "{}{}".format(asset_type, UNSTYLED_POSTFIX)
             self.data_type_combobox_private.addItem(asset_type)
             self.data_type_combobox_public.addItem(asset_type)
+        for raster_type in RASTER_TYPES:
+            qml_path = os.path.join(STYLES_ROOT, "{}.qml".format(raster_type))
+            svg_path = os.path.join(STYLES_ROOT, "{}.svg".format(raster_type))
+            # Check if the QML exists
+            if not os.path.exists(qml_path) and not os.path.exists(svg_path):
+                raster_type = "{}{}".format(raster_type, UNSTYLED_POSTFIX)
+            self.data_type_combobox_private.addItem(raster_type)
 
     def add_areafilters_to_combobox(self):
         """Add the area filters to the combobox."""
@@ -75,6 +85,14 @@ class LizardViewerDockWidget(QtGui.QDockWidget, FORM_CLASS):
         """Function to reset the data."""
         self.data_type_combobox_private.setCurrentIndex(0)
         self.data_type_combobox_public.setCurrentIndex(0)
+
+    def set_maximum_datetime(self):
+        """
+        Set the maximum datetime of the QDateTimeEdit to the current day 23:59.
+        """
+        current_datetime = QDateTime.currentDateTime()
+        self.from_date_dateTimeEdit.setMaximumDateTime(current_datetime)
+        self.to_date_dateTimeEdit.setMaximumDateTime(current_datetime)
 
     def set_all_status_bars_text(self, string):
         """Set the text for the status bars."""
